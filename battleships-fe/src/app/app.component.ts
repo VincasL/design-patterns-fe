@@ -16,8 +16,6 @@ export class AppComponent implements OnInit{
   }
 
   async ngOnInit() {
-    this.onButtonClick()
-
     await this.startConnection();
     console.log(this.hubConnection);
 
@@ -39,6 +37,10 @@ export class AppComponent implements OnInit{
     return new Promise((resolve, reject) => {
       this.hubConnection = new HubConnectionBuilder()
         .withUrl("http://localhost:4200/api/battleship").build();
+
+      this.hubConnection.on('sendMessage', () => {
+        console.log('message received from BE')
+      })
 
       this.hubConnection.start()
         .then(() => {
