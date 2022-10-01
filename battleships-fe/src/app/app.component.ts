@@ -1,29 +1,37 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { tap } from 'rxjs';
-import {SignalrService} from "./services/signalr-service.service";
-import {environment} from "../environments/environment";
-import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import { SignalrService } from "./services/signalr-service.service";
+import { environment } from "../environments/environment";
+import { HttpTransportType, HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit{
-  private hubConnection?: HubConnection
-  constructor( private http: HttpClient) {
+export class AppComponent implements OnInit, OnDestroy {
+  hubConnection?: HubConnection
+  constructor(private http: HttpClient, public signalrService: SignalrService) {
   }
 
   async ngOnInit() {
-    await this.startConnection();
+    this.startConnection();
+
+    setTimeout(() => {
+      this.askServerListener();
+      this.askServer();
+    }, 2000)
     console.log(this.hubConnection);
 
     this.startHttpRequest();
   }
+  ngOnDestroy() {
+    this.hubConnection?.off("askServerResponse");
+  }
 
   private startHttpRequest = () => {
-    this.http.get('/api/test').pipe(
+    this.http.get('http://localhost:5001/api/battleship').pipe(
       tap(x => console.log(x))
     ).subscribe();
   }
@@ -33,24 +41,32 @@ export class AppComponent implements OnInit{
     console.log(this.hubConnection);
   }
 
-  public startConnection() {
-    return new Promise((resolve, reject) => {
-      this.hubConnection = new HubConnectionBuilder()
-        .withUrl("http://localhost:4200/api/battleship").build();
+  startConnection = () => {
+    this.hubConnection = new HubConnectionBuilder()
+      .withUrl("http://localhost:5001/api/battleship", {
+        skipNegotiation: true,
+        transport: HttpTransportType.WebSockets
+      }).build();
 
-      this.hubConnection.on('sendMessage', () => {
-        console.log('message received from BE')
+    this.hubConnection.on('sendMessage', () => {
+      console.log('message received from BE')
+    })
+
+    this.hubConnection.start()
+      .then(() => {
+        console.log("connection established");
       })
+      .catch((err: any) => {
+        console.log("error occured" + err);
+      });
+  };
+  askServer() {
+    this.hubConnection?.invoke("askServer", "somethingElse").catch(err => console.error(err));
+  }
 
-      this.hubConnection.start()
-        .then(() => {
-          console.log("connection established");
-          return resolve(true);
-        })
-        .catch((err: any) => {
-          console.log("error occured" + err);
-          reject(err);
-        });
-    });
+  askServerListener() {
+    this.hubConnection?.on("askServerResponse", (someText) => {
+      console.log(someText);
+    })
   }
 }
