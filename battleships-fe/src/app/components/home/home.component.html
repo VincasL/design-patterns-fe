@@ -2,15 +2,19 @@
   <h1>Welcome to battleships!</h1>
   <h2>Enter your name and click play to start</h2>
   <form [formGroup]="form" (submit)="submit()">
-    <div>
-      <input id="name" type="text" formControlName="name">
-      <div *ngIf="name?.invalid && (name?.dirty || name?.touched)"
-           class="text-danger">
-        <div *ngIf="name?.errors?.['required']">
-          Name is required.
-        </div>
-      </div>
+    <input id="name" type="text" formControlName="name" />
+    <div
+      *ngIf="name?.invalid && (name?.dirty || name?.touched)"
+      class="text-danger"
+    >
+      <div *ngIf="name?.errors?.['required']">Name is required.</div>
     </div>
-    <input type="submit" value="Play">
+
+    <input type="submit" value="Play" />
   </form>
+
+  <div *ngIf="isWaitingForOpponent">
+    Waiting for an opponent...<br />
+    <div class="spinner-border" role="status"></div>
+  </div>
 </div>

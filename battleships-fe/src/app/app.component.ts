@@ -1,64 +1,16 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { tap } from 'rxjs';
-import { SignalrService } from "./services/signalr-service.service";
-import { environment } from "../environments/environment";
-import { HttpTransportType, HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import { Component, OnInit } from '@angular/core';
+import {SignalrService} from "./services/signalr.service";
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnInit, OnDestroy {
-  hubConnection?: HubConnection
-  constructor(private http: HttpClient, public signalrService: SignalrService) {
+export class AppComponent implements OnInit {
+  constructor(private readonly signalRService: SignalrService) {
   }
 
-  async ngOnInit() {
-    this.startConnection();
-
-    setTimeout(() => {
-      this.askServerListener();
-      this.askServer();
-    }, 2000)
-  }
-
-  ngOnDestroy() {
-    this.hubConnection?.off("askServerResponse");
-  }
-
-  onButtonClick() {
-    this.askServer();
-  }
-
-  startConnection = () => {
-    this.hubConnection = new HubConnectionBuilder()
-      .withUrl("http://localhost:5166/api/battleship", {
-        skipNegotiation: true,
-        transport: HttpTransportType.WebSockets
-      }).build();
-
-    this.hubConnection.on('sendMessage', () => {
-      console.log('message received from BE')
-    })
-
-    this.hubConnection.start()
-      .then(() => {
-        console.log("connection established");
-      })
-      .catch((err: any) => {
-        console.log("error occured" + err);
-      });
-  };
-
-  askServer() {
-    this.hubConnection?.invoke("askServer", "somethingElse").catch(err => console.error(err));
-  }
-
-  askServerListener() {
-    this.hubConnection?.on("askServerResponse", (someText) => {
-      console.log(someText);
-    })
+  ngOnInit(): void {
+    this.signalRService.startConnection('http://localhost:5166/api/battleship');
   }
 }

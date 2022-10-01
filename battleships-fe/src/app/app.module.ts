@@ -7,11 +7,12 @@ import { HomeComponent } from './components/home/home.component';
 import { GameComponent } from './components/game/game.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { ReactiveFormsModule } from '@angular/forms';
-import { WaitingComponent } from './components/waiting/waiting.component';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
-  declarations: [AppComponent, HomeComponent, GameComponent, SettingsComponent, WaitingComponent],
+  declarations: [AppComponent, HomeComponent, GameComponent, SettingsComponent],
   imports: [
+    CommonModule,
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,

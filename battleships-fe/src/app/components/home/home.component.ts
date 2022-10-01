@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import {SignalrService} from "../../services/signalr.service";
+import {BattleshipService} from "../../services/battleship.service";
 
 @Component({
   selector: 'app-home',
@@ -9,8 +11,9 @@ import { Router } from '@angular/router';
 })
 export class HomeComponent implements OnInit {
   form = new FormGroup({ name: new FormControl(null, Validators.required) });
+  isWaitingForOpponent = false;
 
-  constructor(private readonly router: Router) {}
+  constructor(private readonly router: Router, private readonly battleshipService: BattleshipService) {}
 
   ngOnInit(): void {}
 
@@ -21,8 +24,14 @@ export class HomeComponent implements OnInit {
   submit() {
     this.form.markAllAsTouched();
     if (this.form.valid) {
-      //TODO: make call to api
-      this.router.navigate(['waiting']);
+      const formValue = this.form.value;
+      this.onStartPlaying(formValue);
+      this.isWaitingForOpponent = true;
     }
+  }
+
+  onStartPlaying(formValue: any) {
+    const name = formValue.name;
+    this.battleshipService.startGame(name).subscribe((data) => console.log(data));
   }
 }
