@@ -22,28 +22,19 @@ export class AppComponent implements OnInit, OnDestroy {
       this.askServerListener();
       this.askServer();
     }, 2000)
-    console.log(this.hubConnection);
-
-    this.startHttpRequest();
   }
+
   ngOnDestroy() {
     this.hubConnection?.off("askServerResponse");
   }
 
-  private startHttpRequest = () => {
-    this.http.get('http://localhost:5001/api/battleship').pipe(
-      tap(x => console.log(x))
-    ).subscribe();
-  }
-
   onButtonClick() {
-    this.startHttpRequest();
-    console.log(this.hubConnection);
+    this.askServer();
   }
 
   startConnection = () => {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl("http://localhost:5001/api/battleship", {
+      .withUrl("http://localhost:5166/api/battleship", {
         skipNegotiation: true,
         transport: HttpTransportType.WebSockets
       }).build();
@@ -60,6 +51,7 @@ export class AppComponent implements OnInit, OnDestroy {
         console.log("error occured" + err);
       });
   };
+
   askServer() {
     this.hubConnection?.invoke("askServer", "somethingElse").catch(err => console.error(err));
   }
