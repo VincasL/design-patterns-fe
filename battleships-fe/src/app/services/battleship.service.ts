@@ -1,22 +1,50 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, tap } from 'rxjs';
 import { SignalrService } from './signalr.service';
+import { GameData } from '../shared/models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BattleshipService {
-  private joinQueueSubject: Subject<any> = new Subject();
+  private startGameSubject: Subject<void> = new Subject();
+  private gameDataSubject: Subject<GameData> = new Subject();
 
-  constructor(private readonly signalRService: SignalrService) {}
+  constructor(private readonly signalRService: SignalrService) {
+    this.registerStartGameHandler();
+    this.registerGameDataHandler();
+  }
 
-  startGame(name: string): Observable<any> {
-    this.signalRService.addEventListener('startGame', (player1, player2) =>
-      this.joinQueueSubject.next({player1, player2})
-    );
+  startGame$ = this.startGameSubject.asObservable();
+  gameData$ = this.gameDataSubject.asObservable();
 
-    this.signalRService.emitEvent('joinQueue', name)
+  startGame(name: string): Observable<void> {
+    this.joinQueue(name);
+    return this.startGame$;
+  }
 
-    return this.joinQueueSubject.asObservable();
+  // Sending events
+  private joinQueue(name: string) {
+    this.signalRService.send('joinQueue', name);
+  }
+
+  // Registering event handlers
+  private registerStartGameHandler() {
+    this.signalRService.addEventListener('startGame', () => {
+      this.startGameSubject.next();
+    });
+  }
+
+  private registerGameDataHandler() {
+    this.signalRService.addEventListener('gameData', (gameData) => {
+      this.gameDataSubject.next(gameData);
+    });
+  }
+
+  fetchMockGameData() {
+    this.gameDataSubject.next({
+      playerOne: { name: 'Stepas' },
+      playerTwo: { name: 'Marinis' },
+    });
   }
 }

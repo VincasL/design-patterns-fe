@@ -1,0 +1,12 @@
+<div class="">
+  <div *ngFor="let row of board.cells" class="row board__row">
+    <div
+      *ngFor="let cell of row"
+      (click)="onCellClick()"
+      class="cell p-0 m-0 board__cell"
+    >
+      {{ cell.xCoord }}
+      {{ cell.yCoord }}
+    </div>
+  </div>
+</div>

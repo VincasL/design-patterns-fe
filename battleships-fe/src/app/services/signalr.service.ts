@@ -15,6 +15,7 @@ export interface Message {
   providedIn: 'root',
 })
 export class SignalrService {
+
   hubConnection?: HubConnection;
   constructor(private http: HttpClient) {}
 
@@ -40,7 +41,11 @@ export class SignalrService {
     this.hubConnection?.on(name, callbackFn);
   }
 
-  emitEvent(name: string, args: unknown ) {
+  removeEventListener(name: string,) {
+    this.hubConnection?.off(name);
+  }
+
+  send(name: string, args: unknown ) {
     this.hubConnection
       ?.invoke(name, args)
       .catch((err) => console.error(err));

@@ -8,9 +8,10 @@ import { GameComponent } from './components/game/game.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { BoardComponent } from './components/game/components/board/board.component';
 
 @NgModule({
-  declarations: [AppComponent, HomeComponent, GameComponent, SettingsComponent],
+  declarations: [AppComponent, HomeComponent, GameComponent, SettingsComponent, BoardComponent],
   imports: [
     CommonModule,
     BrowserModule,
