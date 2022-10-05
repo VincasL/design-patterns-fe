@@ -18,8 +18,8 @@ export interface Board {
 }
 
 export enum CellType{
+  NotShot,
   Empty,
-  Mine,
   Ship,
   DamagedShip,
   DestroyedShip
