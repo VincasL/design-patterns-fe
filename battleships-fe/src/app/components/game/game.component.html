@@ -1,9 +1,14 @@
-<h2 class="text-center">{{ gameData?.playerOne?.name }} vs {{gameData?.playerTwo?.name}}</h2>
+<h2 class="text-center">
+  {{ gameData?.playerOne?.name }} vs {{ gameData?.playerTwo?.name }}
+</h2>
 
-<div class="row">
-  <app-board [board]="gameData?.playerOne?.board"></app-board>
-  <br>
-  <app-board [board]="gameData?.playerTwo?.board"></app-board>
+<div class="d-flex">
+  <div class="w-50">
+    <app-board [board]="gameData?.playerOne?.board"></app-board>
+  </div>
+  <div class="w-50">
+    <app-board [board]="gameData?.playerTwo?.board"></app-board>
+  </div>
 </div>
 
 <button (click)="requestData()">FetchData</button>

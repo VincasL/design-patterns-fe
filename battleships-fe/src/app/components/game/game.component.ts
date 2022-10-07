@@ -22,6 +22,7 @@ export class GameComponent implements OnInit {
 
   ngOnInit(): void {
     this.gameData$.subscribe();
+    this.battleshipService.setMockGameSessionData();
   }
 
   requestData(): void {

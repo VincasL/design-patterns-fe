@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Board, Cell, CellType } from '../../../../shared/models';
+import {Injectable} from '@angular/core';
+import {Board, Cell, CellType} from '../../../../shared/models';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +15,7 @@ export class BoardService {
     this._board = this.createBoard();
   }
 
-  createBoard(size: number = 10): Board {
+  createBoard(size: number = 10, emptyCellType: CellType.Empty | CellType.NotShot = CellType.Empty): Board {
     let cells: Cell[][] = [];
     for (let xCoord = 0; xCoord < size; xCoord++) {
       let row: Cell[] = [];
@@ -23,7 +23,7 @@ export class BoardService {
         const cell: Cell = {
           x: xCoord,
           y: yCoord,
-          type: CellType.Empty,
+          type: emptyCellType,
         };
         row.push(cell);
       }
