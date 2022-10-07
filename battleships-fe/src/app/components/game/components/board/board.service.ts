@@ -21,8 +21,8 @@ export class BoardService {
       let row: Cell[] = [];
       for (let yCoord = 0; yCoord < size; yCoord++) {
         const cell: Cell = {
-          xCoord: xCoord,
-          yCoord: yCoord,
+          x: xCoord,
+          y: yCoord,
           type: CellType.Empty,
         };
         row.push(cell);

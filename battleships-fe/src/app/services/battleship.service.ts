@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject, tap } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { SignalrService } from './signalr.service';
-import { GameData } from '../shared/models';
+import { GameData, Ship, ShipType } from '../shared/models';
 
 @Injectable({
   providedIn: 'root',
@@ -28,6 +28,14 @@ export class BattleshipService {
     this.signalRService.send('joinQueue', name);
   }
 
+  private placeShips(ships: Ship[]) {
+    this.signalRService.send('placeShips', ships);
+  }
+
+  requestData() {
+    this.signalRService.send('requestData');
+  }
+
   // Registering event handlers
   private registerStartGameHandler() {
     this.signalRService.addEventListener('startGame', () => {
@@ -37,14 +45,39 @@ export class BattleshipService {
 
   private registerGameDataHandler() {
     this.signalRService.addEventListener('gameData', (gameData) => {
+      console.log(gameData);
       this.gameDataSubject.next(gameData);
     });
   }
 
-  fetchMockGameData() {
-    this.gameDataSubject.next({
-      playerOne: { name: 'Stepas' },
-      playerTwo: { name: 'Marinis' },
-    });
+  sendMockShipData() {
+    const data = [
+      {
+        type: ShipType.Battleship,
+        cell: { x: 0, y: 0 },
+        isHorizontal: true,
+      } as Ship,
+      {
+        type: ShipType.Carrier,
+        cell: { x: 1, y: 1 },
+        isHorizontal: true,
+      },
+      {
+        type: ShipType.Cruiser,
+        cell: { x: 2, y: 2 },
+        isHorizontal: true,
+      },
+      {
+        type: ShipType.Destroyer,
+        cell: { x: 3, y: 3 },
+        isHorizontal: true,
+      },
+      {
+        type: ShipType.Submarine,
+        cell: { x: 4, y: 4 },
+        isHorizontal: true,
+      },
+    ] as Ship[];
+    this.placeShips(data);
   }
 }

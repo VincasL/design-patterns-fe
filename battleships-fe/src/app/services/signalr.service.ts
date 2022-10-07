@@ -45,9 +45,17 @@ export class SignalrService {
     this.hubConnection?.off(name);
   }
 
-  send(name: string, args: unknown ) {
-    this.hubConnection
-      ?.invoke(name, args)
-      .catch((err) => console.error(err));
+  send(name: string, args?: unknown ) {
+    if(args){
+      this.hubConnection
+        ?.invoke(name, args)
+        .catch((err) => console.error(err));
+    }
+    else{
+      this.hubConnection
+        ?.invoke(name)
+        .catch((err) => console.error(err));
+    }
+
   }
 }

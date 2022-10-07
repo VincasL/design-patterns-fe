@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import {BoardService} from "./board.service";
+import {Board, Cell, CellType} from "../../../../shared/models";
 
 @Component({
   selector: 'app-board',
@@ -7,17 +8,29 @@ import {BoardService} from "./board.service";
   styleUrls: ['./board.component.css']
 })
 export class BoardComponent implements OnInit {
-  @Input() boardSize: number = 10;
+  @Input() board?: Board;
 
-  constructor(private readonly boardService: BoardService) { }
-
-  board = this.boardService.board;
+  constructor() { }
 
   ngOnInit(): void {
-    this.boardService.createBoard();
   }
 
   onCellClick() {
+  }
 
+  getCellType(cell: Cell) {
+    switch (cell.type)
+    {
+      case CellType.Empty:
+        return "empty";
+      case CellType.DamagedShip:
+        return "damag"
+      case CellType.DestroyedShip:
+        return "destr"
+      case CellType.NotShot:
+        return "notsh"
+      case CellType.Ship:
+        return "ship"
+    }
   }
 }

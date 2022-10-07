@@ -16,13 +16,19 @@ export class GameComponent implements OnInit {
   gameData$ = this.battleshipService.gameData$.pipe(
     tap((data) => {
       this.gameData = data;
+      console.log(data);
     })
   );
 
   ngOnInit(): void {
     this.gameData$.subscribe();
-    setTimeout(() => {
-      this.battleshipService.fetchMockGameData();
-    }, 500);
+  }
+
+  requestData(): void {
+    this.battleshipService.requestData();
+  }
+
+  sendMockShipData() {
+    this.battleshipService.sendMockShipData();
   }
 }
