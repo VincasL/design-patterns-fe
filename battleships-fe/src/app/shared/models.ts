@@ -7,6 +7,7 @@ export interface GameData {
   playerOne: Player;
   playerTwo: Player;
   areShipsPlaced: boolean;
+  isYourMove: boolean;
 }
 
 export interface Cell {
