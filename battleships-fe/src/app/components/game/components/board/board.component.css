@@ -16,6 +16,31 @@
 .row:nth-child(even) .cell:nth-child(even) {
   background-color: #efefef;
 }
-.cell:hover {
-  border: 2px dotted black;
+
+.cell {
+  @apply border hover:border-dotted hover:border-black hover:border-2;
+}
+
+.board {
+  @apply border-8 border-black grid grid-cols-10;
+}
+
+.emptyshot {
+  @apply after:flex after:flex-1 after:min-h-full after:justify-center after:items-center after:content-["X"] after:bg-slate-100 after:font-light !important;
+}
+
+.ship {
+  @apply bg-black !important;
+}
+
+.damage {
+  @apply bg-orange-200 !important;
+}
+
+.destroy {
+  @apply bg-red-200 !important;
+}
+
+.notshot {
+  @apply bg-white !important;
 }

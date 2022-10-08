@@ -1,13 +1,12 @@
-export interface Player{
+export interface Player {
   name: string;
   board: Board;
 }
 
-export interface GameData{
+export interface GameData {
   playerOne: Player;
   playerTwo: Player;
   areShipsPlaced: boolean;
-
 }
 
 export interface Cell {
@@ -16,32 +15,30 @@ export interface Cell {
   type: CellType;
 }
 
-export enum ShipType
-{
+export enum ShipType {
   Carrier, // 5 tiles
   Battleship, // 4 tiles
   Cruiser, // 3 tiles
   Submarine, // 3 tiles
-  Destroyer // 2 tiles
+  Destroyer, // 2 tiles
 }
 
 export interface Ship {
-  type: ShipType,
-  cell: Cell
-  isHorizontal: boolean
+  type: ShipType;
+  cell: Cell;
+  isHorizontal: boolean;
 }
 
 export interface Board {
-  cells: Cell[][]
+  cells: Cell[][];
+  size: number;
 }
 
-export enum CellType{
+export enum CellType {
   NotShot,
   Empty,
   Ship,
   DamagedShip,
-  DestroyedShip
+  DestroyedShip,
+  EmptyShot,
 }
-
-
-

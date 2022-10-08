@@ -1,11 +1,9 @@
-<div class="">
-  <div *ngFor="let row of board?.cells" class="row board__row">
+<div class="board">
+  <div *ngFor="let row of board?.cells" class="board-row">
     <div
       *ngFor="let cell of row"
-      (click)="onCellClick()"
-      class="cell p-0 m-0 board__cell"
-    >
-      {{getCellType(cell)}}
-    </div>
+      (click)="onCellClick(cell)"
+      class="cell p-0 m-0 board__cell {{ getCellType(cell) }}"
+    ></div>
   </div>
 </div>
