@@ -24,6 +24,7 @@ export class SignalrService {
       .withUrl(url, {
         skipNegotiation: true,
         transport: HttpTransportType.WebSockets,
+        timeout: 999999999999
       })
       .build();
 

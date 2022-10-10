@@ -28,11 +28,19 @@ export class GameComponent implements OnInit {
     this.battleshipService.requestData();
   }
 
+  sendShipData() {
+    this.battleshipService.sendShipData();
+  }
+
   sendMockShipData() {
     this.battleshipService.sendMockShipData();
   }
 
   setMockSessionData() {
     this.battleshipService.setMockGameSessionData();
+  }
+
+  destroyEverything() {
+    this.battleshipService.destroyAllShipsAndWinGame();
   }
 }

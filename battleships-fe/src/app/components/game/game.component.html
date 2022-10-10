@@ -8,6 +8,7 @@
       <button (click)="requestData()">Console log session data</button>
       <button (click)="sendMockShipData()">Place mock ships</button>
       <button (click)="setMockSessionData()">Set mock session data</button>
+      <button (click)="destroyEverything()">Destroy</button>
     </div>
   </div>
 
@@ -16,5 +17,5 @@
     <app-board [board]="gameData?.playerTwo?.board"></app-board>
   </div>
 
-  <button (click)="sendMockShipData()">place ships</button>
+  <button (click)="sendShipData()">place ships</button>
 </div>

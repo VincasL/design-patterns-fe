@@ -43,3 +43,8 @@ export enum CellType {
   DestroyedShip,
   EmptyShot,
 }
+
+export interface Move {
+  X: number,
+  Y: number
+}

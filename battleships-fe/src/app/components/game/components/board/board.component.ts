@@ -6,6 +6,7 @@ import {
   Ship,
   ShipType,
 } from '../../../../shared/models';
+import {BattleshipService} from "../../../../services/battleship.service";
 
 const DIAGONAL_DIRECTIONS = [
   { x: -1, y: -1 },
@@ -32,7 +33,7 @@ export class BoardComponent implements OnInit {
   private ships: Ship[] = [];
   private shipsCells: Cell[][] = [];
 
-  constructor() {}
+  constructor(private readonly battleshipService: BattleshipService) {}
 
   ngOnInit(): void {}
 
@@ -74,6 +75,7 @@ export class BoardComponent implements OnInit {
         cell,
       });
     });
+    this.battleshipService.ships = this.ships;
   }
 
   getShipType(ship: Cell[]) {
