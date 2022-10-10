@@ -107,7 +107,7 @@ export class BoardComponent implements OnInit {
     };
 
     const id = getShipId(lastCell);
-    if (lastCell.type === CellType.Empty) {
+    if (lastCell.type === CellType.NotShot) {
       this.shipsCells = this.shipsCells
         .map((ship) => ship.filter((cell) => cell !== lastCell))
         .filter((ship) => ship.length > 0);
@@ -126,19 +126,19 @@ export class BoardComponent implements OnInit {
         cell.type = type;
       });
     };
-    if (lastCell.type === CellType.Empty)
-      updateDiagonal(lastCell, CellType.Empty);
+    if (lastCell.type === CellType.NotShot)
+      updateDiagonal(lastCell, CellType.NotShot);
 
     shipCells.forEach((cell) => updateDiagonal(cell, CellType.EmptyShot));
   }
 
   placeShip(cell: Cell) {
-    if (cell.type == CellType.Empty) {
+    if (cell.type == CellType.NotShot) {
       cell.type = CellType.Ship;
       return;
     }
     if (cell.type == CellType.Ship) {
-      cell.type = CellType.Empty;
+      cell.type = CellType.NotShot;
     }
   }
 
