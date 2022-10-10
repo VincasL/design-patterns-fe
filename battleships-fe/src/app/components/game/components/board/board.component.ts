@@ -45,7 +45,7 @@ export class BoardComponent implements OnInit {
 
       this.convertShips();
 
-      console.log(this.shipsCells.map((ship) => ship.length));
+      console.log(this.ships);
     }
 
     // if (cell.type == CellType.Ship) {
@@ -79,10 +79,10 @@ export class BoardComponent implements OnInit {
   getShipType(ship: Cell[]) {
     const size = ship.length;
 
+    if (size === 5) return ShipType.Carrier;
     if (size === 4) return ShipType.Battleship;
-    if (size === 3) return ShipType.Carrier;
-    if (size === 2) return ShipType.Cruiser;
-    if (size === 1) return ShipType.Submarine;
+    if (size === 3) return ShipType.Cruiser;
+    if (size === 2) return ShipType.Destroyer;
     return ShipType.Destroyer;
   }
 
