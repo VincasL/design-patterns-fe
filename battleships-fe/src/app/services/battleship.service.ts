@@ -99,24 +99,24 @@ export class BattleshipService {
     } as GameData;
 
     //Player one
-    // data.playerOne.board.cells[0][0].type = CellType.Ship;
-    // data.playerOne.board.cells[0][1].type = CellType.Ship;
-    // data.playerOne.board.cells[0][2].type = CellType.Ship;
-    // data.playerOne.board.cells[0][3].type = CellType.Ship;
-    // data.playerOne.board.cells[1][0].type = CellType.DamagedShip;
-    // data.playerOne.board.cells[1][1].type = CellType.DamagedShip;
-    // data.playerOne.board.cells[1][2].type = CellType.Ship;
-    // data.playerOne.board.cells[2][0].type = CellType.DestroyedShip;
-    // data.playerOne.board.cells[2][1].type = CellType.DestroyedShip;
-    // data.playerOne.board.cells[2][2].type = CellType.DestroyedShip;
+    // data.playerOne.board.cells[0][0].type = CellType.Ship
+    // data.playerOne.board.cells[0][1].type = CellType.Ship
+    // data.playerOne.board.cells[0][2].type = CellType.Ship
+    // data.playerOne.board.cells[0][3].type = CellType.Ship
+    // data.playerOne.board.cells[1][0].type = CellType.DamagedShip
+    // data.playerOne.board.cells[1][1].type = CellType.DamagedShip
+    // data.playerOne.board.cells[1][2].type = CellType.Ship
+    // data.playerOne.board.cells[2][0].type = CellType.DestroyedShip
+    // data.playerOne.board.cells[2][1].type = CellType.DestroyedShip
+    // data.playerOne.board.cells[2][2].type = CellType.DestroyedShip
 
     // //Player two (enemy)
-    // data.playerTwo.board.cells[1][0].type = CellType.DamagedShip;
-    // data.playerTwo.board.cells[1][1].type = CellType.DamagedShip;
-    // data.playerTwo.board.cells[2][0].type = CellType.DestroyedShip;
-    // data.playerTwo.board.cells[2][1].type = CellType.DestroyedShip;
-    // data.playerTwo.board.cells[2][2].type = CellType.DestroyedShip;
+    // data.playerTwo.board.cells[1][0].type = CellType.DamagedShip
+    // data.playerTwo.board.cells[1][1].type = CellType.DamagedShip
+    // data.playerTwo.board.cells[2][0].type = CellType.DestroyedShip
+    // data.playerTwo.board.cells[2][1].type = CellType.DestroyedShip
+    // data.playerTwo.board.cells[2][2].type = CellType.DestroyedShip
 
-    // this.gameDataSubject.next(data);
+    this.gameDataSubject.next(data);
   }
 }
