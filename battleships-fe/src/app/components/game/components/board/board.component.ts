@@ -65,7 +65,7 @@ export class BoardComponent implements OnInit {
       const isHorizontal = ship.every((cord) => cord.x === firstCell.x);
       const key = isHorizontal ? 'x' : 'y';
       const cell = ship
-        .sort((a, b) => (a[key] <= b[key] ? -1 : 1))
+        .sort((a, b) => (a[key] >= b[key] ? -1 : 1))
         .at(0) as Cell;
 
       this.ships.push({
