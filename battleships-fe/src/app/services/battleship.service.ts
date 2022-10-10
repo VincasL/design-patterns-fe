@@ -1,22 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { BoardService } from '../components/game/components/board/board.service';
-import { Cell, CellType, GameData, Ship, ShipType } from '../shared/models';
+import { CellType, GameData, Player, Ship, ShipType } from '../shared/models';
 import { SignalrService } from './signalr.service';
-
-const DIAGONAL_DIRECTIONS = [
-  { x: -1, y: -1 },
-  { x: 1, y: -1 },
-  { x: 1, y: 1 },
-  { x: -1, y: 1 },
-];
-
-const DIRECTIOINS = [
-  { x: 0, y: -1 },
-  { x: 0, y: 1 },
-  { x: -1, y: 0 },
-  { x: 1, y: 0 },
-];
 
 @Injectable({
   providedIn: 'root',
@@ -24,10 +10,6 @@ const DIRECTIOINS = [
 export class BattleshipService {
   private startGameSubject: Subject<void> = new Subject();
   private gameDataSubject: Subject<GameData> = new Subject();
-
-  public isShipsPlaced = false;
-  private ships: Ship[] = [];
-  private shipsCells: Cell[][] = [];
 
   constructor(
     private readonly signalRService: SignalrService,
@@ -72,146 +54,69 @@ export class BattleshipService {
     });
   }
 
-  sendShips(ships: Ship[]) {
-    this.sendShips(ships);
+  sendMockShipData() {
+    const data = [
+      {
+        type: ShipType.Battleship,
+        cell: { x: 0, y: 0 },
+        isHorizontal: true,
+      } as Ship,
+      {
+        type: ShipType.Carrier,
+        cell: { x: 1, y: 1 },
+        isHorizontal: true,
+      },
+      {
+        type: ShipType.Cruiser,
+        cell: { x: 2, y: 2 },
+        isHorizontal: true,
+      },
+      {
+        type: ShipType.Destroyer,
+        cell: { x: 3, y: 3 },
+        isHorizontal: true,
+      },
+      {
+        type: ShipType.Submarine,
+        cell: { x: 4, y: 4 },
+        isHorizontal: true,
+      },
+    ] as Ship[];
+    this.placeShips(data);
   }
 
-  convertShips() {
-    this.ships = [];
-    this.shipsCells.forEach((ship) => {
-      const firstCell = ship[0];
-      const type = this.getShipType(ship);
-      const isHorizontal = ship.every((cord) => cord.x === firstCell.x);
-      const key = isHorizontal ? 'x' : 'y';
-      const cell = ship
-        .sort((a, b) => (a[key] <= b[key] ? -1 : 1))
-        .at(0) as Cell;
+  setMockGameSessionData() {
+    const data = {
+      playerOne: {
+        name: 'Marinis',
+        board: this.boardService.createBoard(10, CellType.Empty),
+      } as Player,
+      playerTwo: {
+        name: 'Stepas',
+        board: this.boardService.createBoard(10, CellType.NotShot),
+      } as Player,
+      areShipsPlaced: true,
+    } as GameData;
 
-      this.ships.push({
-        isHorizontal,
-        type,
-        cell,
-      });
-    });
-  }
+    //Player one
+    // data.playerOne.board.cells[0][0].type = CellType.Ship;
+    // data.playerOne.board.cells[0][1].type = CellType.Ship;
+    // data.playerOne.board.cells[0][2].type = CellType.Ship;
+    // data.playerOne.board.cells[0][3].type = CellType.Ship;
+    // data.playerOne.board.cells[1][0].type = CellType.DamagedShip;
+    // data.playerOne.board.cells[1][1].type = CellType.DamagedShip;
+    // data.playerOne.board.cells[1][2].type = CellType.Ship;
+    // data.playerOne.board.cells[2][0].type = CellType.DestroyedShip;
+    // data.playerOne.board.cells[2][1].type = CellType.DestroyedShip;
+    // data.playerOne.board.cells[2][2].type = CellType.DestroyedShip;
 
-  getShipType(ship: Cell[]) {
-    const size = ship.length;
+    // //Player two (enemy)
+    // data.playerTwo.board.cells[1][0].type = CellType.DamagedShip;
+    // data.playerTwo.board.cells[1][1].type = CellType.DamagedShip;
+    // data.playerTwo.board.cells[2][0].type = CellType.DestroyedShip;
+    // data.playerTwo.board.cells[2][1].type = CellType.DestroyedShip;
+    // data.playerTwo.board.cells[2][2].type = CellType.DestroyedShip;
 
-    if (size === 5) return ShipType.Carrier;
-    if (size === 4) return ShipType.Battleship;
-    if (size === 3) return ShipType.Cruiser;
-    if (size === 2) return ShipType.Destroyer;
-    return ShipType.Destroyer;
-  }
-
-  validateShips() {
-    const error: { [num: number]: number } = {};
-    [4, 3, 2, 1].forEach(
-      (length) => (error[length] = this.countShipsByLength(length))
-    );
-
-    return error;
-  }
-
-  updateShips(lastCell: Cell) {
-    const getShipId = (cell: Cell) => {
-      for (let id = 0; id < this.shipsCells.length; id++) {
-        const ship = this.shipsCells[id];
-        const arroundCells = this.getAroundCells(cell.x, cell.y);
-        if (ship.includes(cell)) return id;
-        if (arroundCells.some((cell) => ship.includes(cell))) return id;
-      }
-      return undefined;
-    };
-
-    const id = getShipId(lastCell);
-    if (lastCell.type === CellType.Empty) {
-      this.shipsCells = this.shipsCells
-        .map((ship) => ship.filter((cell) => cell !== lastCell))
-        .filter((ship) => ship.length > 0);
-    } else if (id === undefined) this.shipsCells.push([lastCell]);
-    else {
-      this.shipsCells[id].push(lastCell);
-    }
-  }
-
-  updatePlayerMap(lastCell: Cell) {
-    const shipCells = this.getShipCells();
-
-    const updateDiagonal = (cell: Cell, type: CellType) => {
-      const diagonalCells = this.getDiagonalCells(cell.x, cell.y);
-      diagonalCells.forEach((cell) => {
-        cell.type = type;
-      });
-    };
-    if (lastCell.type === CellType.Empty)
-      updateDiagonal(lastCell, CellType.Empty);
-
-    shipCells.forEach((cell) =>
-      updateDiagonal(cell, CellType.DisabledToPlaceShip)
-    );
-  }
-
-  placeShip(cell: Cell) {
-    if (cell.type == CellType.Empty) {
-      cell.type = CellType.Ship;
-      return;
-    }
-    if (cell.type == CellType.Ship) {
-      cell.type = CellType.Empty;
-    }
-  }
-
-  // --------------------------------------------------------------
-
-  getDiagonalCells(x: number, y: number) {
-    const cells = DIAGONAL_DIRECTIONS.map((dir) =>
-      this.getCellAt(x + dir.x, y + dir.y)
-    );
-    return cells.filter((cell) => cell) as Cell[];
-  }
-
-  getAroundCells(x: number, y: number) {
-    const cells = DIRECTIOINS.map((dir) =>
-      this.getCellAt(x + dir.x, y + dir.y)
-    );
-    return cells.filter((cell) => cell) as Cell[];
-  }
-
-  countShipsByLength(length: number) {
-    return this.shipsCells.filter((ship) => ship.length === length).length;
-  }
-
-  getShipCells() {
-    return this.board?.cells
-      .flat()
-      .filter((cell) => cell.type == CellType.Ship) as Cell[];
-  }
-
-  getCellAt(x: number, y: number) {
-    if (!this.isValidCell(x, y)) return;
-    return this.board?.cells[x][y];
-  }
-
-  isValidCell(x: number, y: number) {
-    return [x, y].every((cord) => cord > -1 && cord < (this.board?.size || 10));
-  }
-
-  getCellType(cell: Cell) {
-    switch (cell.type) {
-      case CellType.Empty:
-        return 'empty';
-      case CellType.DisabledToPlaceShip:
-        return 'emptyshot';
-      case CellType.DamagedShip:
-        return 'damage';
-      case CellType.DestroyedShip:
-        return 'destroy';
-      case CellType.NotShot:
-        return 'notshot';
-      case CellType.Ship:
-        return 'ship';
-    }
+    // this.gameDataSubject.next(data);
   }
 }

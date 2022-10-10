@@ -41,5 +41,5 @@ export enum CellType {
   Ship,
   DamagedShip,
   DestroyedShip,
-  DisabledToPlaceShip,
+  EmptyShot,
 }
