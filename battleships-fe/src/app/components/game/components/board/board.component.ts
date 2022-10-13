@@ -29,7 +29,7 @@ const DIRECTIOINS = [
 })
 export class BoardComponent implements OnInit {
   @Input() board?: Board;
-  private isShipsPlaced = false;
+  @Input() areShipsPlaced?: boolean;
   private ships: Ship[] = [];
   private shipsCells: Cell[][] = [];
 
@@ -38,15 +38,13 @@ export class BoardComponent implements OnInit {
   ngOnInit(): void {}
 
   onCellClick(cell: Cell) {
-    if (!this.isShipsPlaced) {
+    if (!this.areShipsPlaced) {
       this.placeShip(cell);
       this.updatePlayerMap(cell);
       this.updateShips(cell);
-      const isValid = this.validateShips();
 
       this.convertShips();
-
-      console.log(this.ships);
+    } else if (!this.areShipsPlaced) {
     }
 
     // if (cell.type == CellType.Ship) {
