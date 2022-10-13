@@ -30,6 +30,7 @@ const DIRECTIOINS = [
 export class BoardComponent implements OnInit {
   @Input() board?: Board;
   @Input() areShipsPlaced?: boolean;
+  @Input() isMyBoard?: boolean = false;
   @Input() isYourMove?: boolean;
   @Input() isGameOver?: boolean = false;
   @Input() winner?: boolean = false;
@@ -42,13 +43,19 @@ export class BoardComponent implements OnInit {
 
   onCellClick(cell: Cell) {
     if (this.isGameOver) return;
-    if (!this.areShipsPlaced) {
+    console.log(
+      this.areShipsPlaced,
+      this.isYourMove,
+      this.isGameOver,
+      this.board
+    );
+    if (this.areShipsPlaced === false && this.isMyBoard) {
       this.placeShip(cell);
       this.updatePlayerMap(cell);
       this.updateShips(cell);
 
       this.convertShips();
-    } else if (this.isYourMove) {
+    } else if (this.isYourMove && !this.isMyBoard) {
       this.battleshipService.onMoveMade({ X: cell.x, Y: cell.y });
     }
   }
@@ -136,8 +143,6 @@ export class BoardComponent implements OnInit {
         const ship1 = this.shipsCells[id].slice(0, cellId);
         const ship2 = this.shipsCells[id].slice(cellId + 1);
 
-        // console.log(ship1, ship2);
-
         if (ship1.length > 0) this.shipsCells[id] = [...ship1];
         if (ship2.length > 0) this.shipsCells.push(ship2);
       }
@@ -211,9 +216,9 @@ export class BoardComponent implements OnInit {
   }
 
   isEditable() {
-    if (this.isGameOver === true) return 'not';
-    if (this.areShipsPlaced !== undefined) return 'not';
-    if (this.isYourMove === false) return 'not';
+    if (this.isGameOver) return 'not';
+    if (this.areShipsPlaced && this.isMyBoard) return 'not';
+    if (!this.isYourMove && !this.isMyBoard) return 'not';
     return '';
   }
 
