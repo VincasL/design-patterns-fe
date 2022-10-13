@@ -19,8 +19,8 @@
   @apply border-8 border-black grid grid-cols-10;
 }
 
-.emptyshot {
-  @apply bg-slate-100 !important;
+.empty {
+  @apply after:content-["X"] after:bg-red-100 relative after:absolute after:min-h-full after:min-w-full after:text-center after:my-auto !important;
 }
 
 .ship {
@@ -37,4 +37,8 @@
 
 .notshot {
   @apply bg-white !important;
+}
+
+.not {
+  @apply hover:border-solid hover:border-slate-200 hover:border !important;
 }

@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { BattleshipService } from '../../../../services/battleship.service';
 import {
   Board,
   Cell,
@@ -6,7 +7,6 @@ import {
   Ship,
   ShipType,
 } from '../../../../shared/models';
-import {BattleshipService} from "../../../../services/battleship.service";
 
 const DIAGONAL_DIRECTIONS = [
   { x: -1, y: -1 },
@@ -30,6 +30,9 @@ const DIRECTIOINS = [
 export class BoardComponent implements OnInit {
   @Input() board?: Board;
   @Input() areShipsPlaced?: boolean;
+  @Input() isYourMove?: boolean;
+  @Input() isGameOver?: boolean = false;
+  @Input() winner?: boolean = false;
   private ships: Ship[] = [];
   private shipsCells: Cell[][] = [];
 
@@ -38,34 +41,30 @@ export class BoardComponent implements OnInit {
   ngOnInit(): void {}
 
   onCellClick(cell: Cell) {
+    if (this.isGameOver) return;
     if (!this.areShipsPlaced) {
       this.placeShip(cell);
       this.updatePlayerMap(cell);
       this.updateShips(cell);
 
       this.convertShips();
-    } else if (!this.areShipsPlaced) {
+    } else if (this.isYourMove) {
+      this.battleshipService.onMoveMade({ X: cell.x, Y: cell.y });
     }
-
-    // if (cell.type == CellType.Ship) {
-    //   this.destroyShip(cell);
-    // }
-
-    // if (cell.type == CellType.NotShot) {
-    //   cell.type = CellType.EmptyShot;
-    // }
   }
 
   convertShips() {
     this.ships = [];
-    this.shipsCells.forEach((ship) => {
+    this.shipsCells.forEach((ship, id) => {
       const firstCell = ship[0];
       const type = this.getShipType(ship);
       const isHorizontal = ship.every((cord) => cord.x === firstCell.x);
       const key = isHorizontal ? 'x' : 'y';
-      const cell = ship
-        .sort((a, b) => (a[key] >= b[key] ? -1 : 1))
-        .at(0) as Cell;
+      this.shipsCells[id].sort((a, b) =>
+        a[key] < b[key] ? 1 : b[key] < a[key] ? -1 : 0
+      );
+
+      const cell = ship.at(0) as Cell;
 
       this.ships.push({
         isHorizontal,
@@ -97,24 +96,58 @@ export class BoardComponent implements OnInit {
 
   updateShips(lastCell: Cell) {
     const getShipId = (cell: Cell) => {
+      const ids = [];
       for (let id = 0; id < this.shipsCells.length; id++) {
         const ship = this.shipsCells[id];
         const arroundCells = this.getAroundCells(cell.x, cell.y);
-        if (ship.includes(cell)) return id;
-        if (arroundCells.some((cell) => ship.includes(cell))) return id;
+        if (ship.includes(cell)) ids.push(id);
+        if (arroundCells.some((cell) => ship.includes(cell))) ids.push(id);
       }
-      return undefined;
+      return ids;
     };
 
-    const id = getShipId(lastCell);
-    if (lastCell.type === CellType.NotShot) {
-      this.shipsCells = this.shipsCells
-        .map((ship) => ship.filter((cell) => cell !== lastCell))
-        .filter((ship) => ship.length > 0);
-    } else if (id === undefined) this.shipsCells.push([lastCell]);
-    else {
-      this.shipsCells[id].push(lastCell);
-    }
+    const addShip = () => {
+      if (ids.length === 0) {
+        this.shipsCells.push([lastCell]);
+      } else if (new Set(ids).size === 1) {
+        this.shipsCells[ids[0]].push(lastCell);
+      } else {
+        const joinedShip = [
+          ...ids.map((id) => this.shipsCells[id]).flat(),
+          lastCell,
+        ];
+
+        this.shipsCells = this.shipsCells.filter((_, id) => !ids.includes(id));
+        this.shipsCells.push(joinedShip);
+      }
+    };
+
+    const removeShip = () => {
+      if (ids.length === 0) {
+        this.shipsCells = this.shipsCells
+          .map((ship) => ship.filter((cell) => cell !== lastCell))
+          .filter((ship) => ship.length > 0);
+      } else {
+        const id = ids[0];
+        const cellId = this.shipsCells[id].findIndex(
+          (cell) => cell === lastCell
+        );
+        if (cellId < 0) return;
+        const ship1 = this.shipsCells[id].slice(0, cellId);
+        const ship2 = this.shipsCells[id].slice(cellId + 1);
+
+        // console.log(ship1, ship2);
+
+        if (ship1.length > 0) this.shipsCells[id] = [...ship1];
+        if (ship2.length > 0) this.shipsCells.push(ship2);
+      }
+    };
+
+    let ids = getShipId(lastCell);
+    if (lastCell.type === CellType.Ship) addShip();
+    if (lastCell.type === CellType.NotShot) removeShip();
+
+    console.log(this.shipsCells.map((ship) => ship.length));
   }
 
   updatePlayerMap(lastCell: Cell) {
@@ -175,6 +208,13 @@ export class BoardComponent implements OnInit {
 
   isValidCell(x: number, y: number) {
     return [x, y].every((cord) => cord > -1 && cord < (this.board?.size || 10));
+  }
+
+  isEditable() {
+    if (this.isGameOver === true) return 'not';
+    if (this.areShipsPlaced !== undefined) return 'not';
+    if (this.isYourMove === false) return 'not';
+    return '';
   }
 
   getCellType(cell: Cell) {

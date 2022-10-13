@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { BoardService } from '../components/game/components/board/board.service';
-import {CellType, GameData, Move, Player, Ship, ShipType} from '../shared/models';
+import {
+  CellType,
+  GameData,
+  Move,
+  Player,
+  Ship,
+  ShipType,
+} from '../shared/models';
 import { SignalrService } from './signalr.service';
 
 @Injectable({
@@ -95,7 +102,7 @@ export class BattleshipService {
     const data = {
       playerOne: {
         name: 'Marinis',
-        board: this.boardService.createBoard(10, CellType.Empty),
+        board: this.boardService.createBoard(10, CellType.NotShot),
       } as Player,
       playerTwo: {
         name: 'Stepas',
@@ -105,23 +112,23 @@ export class BattleshipService {
     } as GameData;
 
     // Player one
-    data.playerOne.board.cells[0][0].type = CellType.Ship
-    data.playerOne.board.cells[0][1].type = CellType.Ship
-    data.playerOne.board.cells[0][2].type = CellType.Ship
-    data.playerOne.board.cells[0][3].type = CellType.Ship
-    data.playerOne.board.cells[1][0].type = CellType.DamagedShip
-    data.playerOne.board.cells[1][1].type = CellType.DamagedShip
-    data.playerOne.board.cells[1][2].type = CellType.Ship
-    data.playerOne.board.cells[2][0].type = CellType.DestroyedShip
-    data.playerOne.board.cells[2][1].type = CellType.DestroyedShip
-    data.playerOne.board.cells[2][2].type = CellType.DestroyedShip
+    // data.playerOne.board.cells[0][0].type = CellType.Ship;
+    // data.playerOne.board.cells[0][1].type = CellType.Ship;
+    // data.playerOne.board.cells[0][2].type = CellType.Ship;
+    // data.playerOne.board.cells[0][3].type = CellType.Ship;
+    // data.playerOne.board.cells[1][0].type = CellType.DamagedShip;
+    // data.playerOne.board.cells[1][1].type = CellType.DamagedShip;
+    // data.playerOne.board.cells[1][2].type = CellType.Ship;
+    // data.playerOne.board.cells[2][0].type = CellType.DestroyedShip;
+    // data.playerOne.board.cells[2][1].type = CellType.DestroyedShip;
+    // data.playerOne.board.cells[2][2].type = CellType.DestroyedShip;
 
-    //Player two (enemy)
-    data.playerTwo.board.cells[1][0].type = CellType.DamagedShip
-    data.playerTwo.board.cells[1][1].type = CellType.DamagedShip
-    data.playerTwo.board.cells[2][0].type = CellType.DestroyedShip
-    data.playerTwo.board.cells[2][1].type = CellType.DestroyedShip
-    data.playerTwo.board.cells[2][2].type = CellType.DestroyedShip
+    // //Player two (enemy)
+    // data.playerTwo.board.cells[1][0].type = CellType.DamagedShip;
+    // data.playerTwo.board.cells[1][1].type = CellType.DamagedShip;
+    // data.playerTwo.board.cells[2][0].type = CellType.DestroyedShip;
+    // data.playerTwo.board.cells[2][1].type = CellType.DestroyedShip;
+    // data.playerTwo.board.cells[2][2].type = CellType.DestroyedShip;
 
     this.gameDataSubject.next(data);
   }
@@ -130,7 +137,6 @@ export class BattleshipService {
     console.log(this.ships);
     this.placeShips(this.ships);
   }
-
 
   makeMockMove() {
     const data = {
@@ -141,10 +147,15 @@ export class BattleshipService {
     this.makeMove(data);
   }
 
+  onMoveMade(move: Move) {
+    console.log('move');
+    this.makeMove(move);
+  }
+
   async destroyAllShipsAndWinGame() {
     const delay = (time: number) => {
-      return new Promise(resolve => setTimeout(resolve, time));
-    }
+      return new Promise((resolve) => setTimeout(resolve, time));
+    };
 
     const moves: Move[] = [];
 
@@ -171,6 +182,4 @@ export class BattleshipService {
       this.makeMove(move);
     }
   }
-
-
 }

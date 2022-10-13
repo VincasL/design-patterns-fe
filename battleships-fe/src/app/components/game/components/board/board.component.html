@@ -3,7 +3,9 @@
     <div
       *ngFor="let cell of row"
       (click)="onCellClick(cell)"
-      class="cell p-0 m-0 board__cell {{ getCellType(cell) }}"
+      class="cell p-0 m-0 board__cell {{ getCellType(cell) }} {{
+        isEditable()
+      }}"
     ></div>
   </div>
 </div>

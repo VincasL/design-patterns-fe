@@ -8,6 +8,8 @@ export interface GameData {
   playerTwo: Player;
   areShipsPlaced: boolean;
   isYourMove: boolean;
+  isGameOver: boolean;
+  winner: boolean;
 }
 
 export interface Cell {
@@ -45,6 +47,6 @@ export enum CellType {
 }
 
 export interface Move {
-  X: number,
-  Y: number
+  X: number;
+  Y: number;
 }
