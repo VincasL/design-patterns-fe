@@ -17,7 +17,9 @@ export class HomeComponent implements OnInit {
     private readonly battleshipService: BattleshipService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    sessionStorage.clear();
+  }
 
   get name() {
     return this.form.get('name');

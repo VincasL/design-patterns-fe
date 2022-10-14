@@ -42,3 +42,7 @@
 .not {
   @apply hover:border-solid hover:border-slate-200 hover:border !important;
 }
+
+button {
+  @apply bg-slate-300 border-2 border-black;
+}

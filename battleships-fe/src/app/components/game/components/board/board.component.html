@@ -1,3 +1,12 @@
+<div *ngIf="isMyBoard && placingShips">
+  <button
+    [disabled]="shipIsPlaced(shipType)"
+    *ngFor="let shipType of shipTypes"
+    (click)="currentlyPlacingShipType = shipType"
+  >
+    {{ ShipType[shipType] }}
+  </button>
+</div>
 <div class="board">
   <div *ngFor="let row of board?.cells" class="board-row">
     <div

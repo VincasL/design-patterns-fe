@@ -37,15 +37,23 @@ export class BattleshipService {
   }
 
   // Sending events
-  private joinQueue(name: string) {
+  joinQueue(name: string) {
     this.signalRService.send('joinQueue', name);
   }
 
-  private placeShips(ships: Ship[]) {
-    this.signalRService.send('placeShips', ships);
+  saveShips() {
+    this.signalRService.send('placeShips');
   }
 
-  private makeMove(move: Move) {
+  placeShip(ship: Ship) {
+    this.signalRService.send('placeShip', ship);
+  }
+
+  undoShip(move: Move) {
+    this.signalRService.send('undoPlaceShip', move)
+  }
+
+  makeMove(move: Move) {
     this.signalRService.send('makeMove', move);
   }
 
@@ -95,7 +103,7 @@ export class BattleshipService {
         isHorizontal: true,
       },
     ] as Ship[];
-    this.placeShips(data);
+    data.forEach((item: Ship) => this.placeShip(item));
   }
 
   setMockGameSessionData() {
@@ -108,7 +116,7 @@ export class BattleshipService {
         name: 'Stepas',
         board: this.boardService.createBoard(10, CellType.NotShot),
       } as Player,
-      areShipsPlaced: true,
+      allPlayersPlacedShips: true,
     } as GameData;
 
     // Player one
@@ -133,11 +141,6 @@ export class BattleshipService {
     this.gameDataSubject.next(data);
   }
 
-  sendShipData() {
-    console.log(this.ships);
-    this.placeShips(this.ships);
-  }
-
   makeMockMove() {
     const data = {
       X: Math.floor(Math.random() * 10),
@@ -145,11 +148,6 @@ export class BattleshipService {
     };
 
     this.makeMove(data);
-  }
-
-  onMoveMade(move: Move) {
-    console.log('move');
-    this.makeMove(move);
   }
 
   async destroyAllShipsAndWinGame() {
@@ -181,5 +179,9 @@ export class BattleshipService {
       await delay(1000);
       this.makeMove(move);
     }
+  }
+
+  assignNewConnectionId(connectionId: string) {
+    this.signalRService.send('assignNewConnectionId', connectionId);
   }
 }

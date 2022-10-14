@@ -1,12 +1,15 @@
 export interface Player {
   name: string;
+  connectionId: string;
   board: Board;
+  placedShips: Ship[]
+  areAllShipsPlaced: boolean,
 }
 
 export interface GameData {
   playerOne: Player;
   playerTwo: Player;
-  areShipsPlaced: boolean;
+  allPlayersPlacedShips: boolean;
   isYourMove: boolean;
   isGameOver: boolean;
   winner: boolean;

@@ -17,7 +17,7 @@ import { BoardComponent } from './components/game/components/board/board.compone
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
-    ReactiveFormsModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent],

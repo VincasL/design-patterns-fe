@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { tap } from 'rxjs';
-import { GameData } from '../../shared/models';
+import { filter, Observable, tap } from 'rxjs';
+import {GameData, Ship} from '../../shared/models';
 import { BattleshipService } from '../../services/battleship.service';
 
 @Component({
@@ -13,14 +13,17 @@ export class GameComponent implements OnInit {
 
   gameData?: GameData;
 
-  gameData$ = this.battleshipService.gameData$.pipe(
+  gameData$: Observable<GameData> = this.battleshipService.gameData$.pipe(
+    filter(Boolean),
     tap((data) => {
       this.gameData = data;
+      sessionStorage.setItem('connectionId', data.playerOne.connectionId);
       console.log(data);
     })
   );
 
   ngOnInit(): void {
+    this.assignNewConnectionIdToPlayerAfterRefresh();
     this.gameData$.subscribe();
   }
 
@@ -28,8 +31,12 @@ export class GameComponent implements OnInit {
     this.battleshipService.requestData();
   }
 
+  placeShip(ship: Ship): void {
+    this.battleshipService.placeShip(ship);
+  }
+
   sendShipData() {
-    this.battleshipService.sendShipData();
+    this.battleshipService.saveShips();
   }
 
   sendMockShipData() {
@@ -42,5 +49,14 @@ export class GameComponent implements OnInit {
 
   destroyEverything() {
     this.battleshipService.destroyAllShipsAndWinGame();
+  }
+
+  private assignNewConnectionIdToPlayerAfterRefresh() {
+    const connectionId = sessionStorage.getItem('connectionId');
+    console.log(connectionId);
+    if(connectionId)
+    {
+      setTimeout(() => this.battleshipService.assignNewConnectionId(connectionId), 500);
+    }
   }
 }
