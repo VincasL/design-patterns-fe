@@ -27,14 +27,6 @@ export class GameComponent implements OnInit {
     this.gameData$.subscribe();
   }
 
-  requestData(): void {
-    this.battleshipService.requestData();
-  }
-
-  placeShip(ship: Ship): void {
-    this.battleshipService.placeShip(ship);
-  }
-
   sendShipData() {
     this.battleshipService.saveShips();
   }

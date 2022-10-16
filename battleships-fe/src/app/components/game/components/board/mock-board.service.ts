@@ -4,7 +4,7 @@ import { Board, Cell, CellType } from '../../../../shared/models';
 @Injectable({
   providedIn: 'root',
 })
-export class BoardService {
+export class MockBoardService {
   private _board: Board;
 
   get board(): Board {

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { BoardService } from '../components/game/components/board/board.service';
+import { MockBoardService } from '../components/game/components/board/mock-board.service';
 import {
   CellType,
   GameData,
@@ -20,7 +20,7 @@ export class BattleshipService {
 
   constructor(
     private readonly signalRService: SignalrService,
-    private readonly boardService: BoardService
+    private readonly boardService: MockBoardService
   ) {
     this.registerStartGameHandler();
     this.registerGameDataHandler();
@@ -51,6 +51,10 @@ export class BattleshipService {
 
   undoShip(move: Move) {
     this.signalRService.send('undoPlaceShip', move)
+  }
+
+  rotateShip(move: Move) {
+    this.signalRService.send('rotateShip', move)
   }
 
   makeMove(move: Move) {
@@ -111,32 +115,36 @@ export class BattleshipService {
       playerOne: {
         name: 'Marinis',
         board: this.boardService.createBoard(10, CellType.NotShot),
+        placedShips: [] as Ship[]
       } as Player,
       playerTwo: {
         name: 'Stepas',
         board: this.boardService.createBoard(10, CellType.NotShot),
+        placedShips: [] as Ship[]
       } as Player,
       allPlayersPlacedShips: true,
     } as GameData;
 
     // Player one
-    // data.playerOne.board.cells[0][0].type = CellType.Ship;
-    // data.playerOne.board.cells[0][1].type = CellType.Ship;
-    // data.playerOne.board.cells[0][2].type = CellType.Ship;
-    // data.playerOne.board.cells[0][3].type = CellType.Ship;
-    // data.playerOne.board.cells[1][0].type = CellType.DamagedShip;
-    // data.playerOne.board.cells[1][1].type = CellType.DamagedShip;
-    // data.playerOne.board.cells[1][2].type = CellType.Ship;
-    // data.playerOne.board.cells[2][0].type = CellType.DestroyedShip;
-    // data.playerOne.board.cells[2][1].type = CellType.DestroyedShip;
-    // data.playerOne.board.cells[2][2].type = CellType.DestroyedShip;
+    data.playerOne.board.cells[0][0].type = CellType.Ship;
+    data.playerOne.board.cells[0][1].type = CellType.Ship;
+    data.playerOne.board.cells[0][2].type = CellType.Ship;
+    data.playerOne.board.cells[0][3].type = CellType.Ship;
+    data.playerOne.board.cells[1][0].type = CellType.DamagedShip;
+    data.playerOne.board.cells[1][1].type = CellType.DamagedShip;
+    data.playerOne.board.cells[1][2].type = CellType.Ship;
+    data.playerOne.board.cells[2][0].type = CellType.DestroyedShip;
+    data.playerOne.board.cells[2][1].type = CellType.DestroyedShip;
+    data.playerOne.board.cells[2][2].type = CellType.DestroyedShip;
 
-    // //Player two (enemy)
-    // data.playerTwo.board.cells[1][0].type = CellType.DamagedShip;
-    // data.playerTwo.board.cells[1][1].type = CellType.DamagedShip;
-    // data.playerTwo.board.cells[2][0].type = CellType.DestroyedShip;
-    // data.playerTwo.board.cells[2][1].type = CellType.DestroyedShip;
-    // data.playerTwo.board.cells[2][2].type = CellType.DestroyedShip;
+    //Player two (enemy)
+    data.playerTwo.board.cells[1][0].type = CellType.DamagedShip;
+    data.playerTwo.board.cells[1][1].type = CellType.DamagedShip;
+    data.playerTwo.board.cells[2][0].type = CellType.DestroyedShip;
+    data.playerTwo.board.cells[2][1].type = CellType.DestroyedShip;
+    data.playerTwo.board.cells[2][2].type = CellType.DestroyedShip;
+    data.playerTwo.board.cells[2][2].type = CellType.Empty;
+
 
     this.gameDataSubject.next(data);
   }
@@ -184,4 +192,6 @@ export class BattleshipService {
   assignNewConnectionId(connectionId: string) {
     this.signalRService.send('assignNewConnectionId', connectionId);
   }
+
+
 }

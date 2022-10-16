@@ -12,6 +12,7 @@
     <div
       *ngFor="let cell of row"
       (click)="onCellClick(cell)"
+      (contextmenu)="onCellClick(cell, true)"
       class="cell p-0 m-0 board__cell {{ getCellType(cell) }} {{
         isEditable()
       }}"
