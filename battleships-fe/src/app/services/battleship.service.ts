@@ -10,13 +10,14 @@ import {
   ShipType,
 } from '../shared/models';
 import { SignalrService } from './signalr.service';
+import {GameDataSubject} from "../observer/GameDataSubject";
 
 @Injectable({
   providedIn: 'root',
 })
 export class BattleshipService {
   private startGameSubject: Subject<void> = new Subject();
-  private gameDataSubject: Subject<GameData> = new Subject();
+  private gameDataSubject: GameDataSubject = new GameDataSubject();
 
   constructor(
     private readonly signalRService: SignalrService,
@@ -27,7 +28,7 @@ export class BattleshipService {
   }
 
   startGame$ = this.startGameSubject.asObservable();
-  gameData$ = this.gameDataSubject.asObservable();
+  gameData$ = this.gameDataSubject;
 
   ships: Ship[] = [];
 
@@ -75,7 +76,7 @@ export class BattleshipService {
   private registerGameDataHandler() {
     this.signalRService.addEventListener('gameData', (gameData) => {
       console.log(gameData);
-      this.gameDataSubject.next(gameData);
+      this.gameDataSubject.receiveGameData(gameData);
     });
   }
 
@@ -146,16 +147,7 @@ export class BattleshipService {
     data.playerTwo.board.cells[2][2].type = CellType.Empty;
 
 
-    this.gameDataSubject.next(data);
-  }
-
-  makeMockMove() {
-    const data = {
-      X: Math.floor(Math.random() * 10),
-      Y: Math.floor(Math.random() * 10),
-    };
-
-    this.makeMove(data);
+    this.gameDataSubject.receiveGameData(data);
   }
 
   async destroyAllShipsAndWinGame() {
@@ -192,6 +184,4 @@ export class BattleshipService {
   assignNewConnectionId(connectionId: string) {
     this.signalRService.send('assignNewConnectionId', connectionId);
   }
-
-
 }

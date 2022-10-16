@@ -9,6 +9,7 @@ import {
   ShipType,
 } from '../../../../shared/models';
 import { tap } from 'rxjs';
+import {GameDataObserver} from "../../../../observer/GameDataObserver";
 
 @Component({
   selector: 'app-board',
@@ -22,6 +23,13 @@ export class BoardComponent implements OnInit {
   currentlyPlacingShipType?: ShipType;
   ShipType = ShipType;
 
+  gameDataObserver: GameDataObserver = new GameDataObserver(
+    (gameData) =>{
+      (this.gameData = gameData);
+      this.placingShips = !gameData.playerOne.areAllShipsPlaced;
+    }
+  );
+
   shipTypes = [
     ShipType.Carrier, // 5 tiles
     ShipType.Battleship, // 4 tiles
@@ -33,14 +41,7 @@ export class BoardComponent implements OnInit {
   constructor(private readonly battleshipService: BattleshipService) {}
 
   ngOnInit(): void {
-    this.battleshipService.gameData$
-      .pipe(
-        tap((gameData) => {
-          this.gameData = gameData;
-          this.placingShips = !gameData.playerOne.areAllShipsPlaced;
-        })
-      )
-      .subscribe();
+    this.battleshipService.gameData$.subscribe(this.gameDataObserver);
   }
 
   get board(): Board | undefined {
