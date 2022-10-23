@@ -46,10 +46,10 @@ export class SignalrService {
     this.hubConnection?.off(name);
   }
 
-  send(name: string, args?: unknown ) {
+  send(name: string, ...args: any[] ) {
     if(args){
       this.hubConnection
-        ?.invoke(name, args)
+        ?.invoke(name, ...args)
         .catch((err) => console.error(err));
     }
     else{
@@ -57,6 +57,5 @@ export class SignalrService {
         ?.invoke(name)
         .catch((err) => console.error(err));
     }
-
   }
 }

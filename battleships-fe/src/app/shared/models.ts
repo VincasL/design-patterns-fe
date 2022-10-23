@@ -29,6 +29,13 @@ export enum ShipType {
   Destroyer, // 2 tiles
 }
 
+export enum MoveDirection{
+  Up,
+  Right,
+  Down,
+  Left
+}
+
 export interface Ship {
   type: ShipType;
   cell: Cell;
@@ -49,7 +56,7 @@ export enum CellType {
   EmptyShot,
 }
 
-export interface Move {
+export interface CellCoordinates {
   X: number;
   Y: number;
 }

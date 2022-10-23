@@ -52,4 +52,8 @@ export class GameComponent implements OnInit {
       );
     }
   }
+
+  moveRight() {
+    this.battleshipService.moveRight({X: 1, Y:1});
+  }
 }

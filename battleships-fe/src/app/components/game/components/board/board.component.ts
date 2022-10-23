@@ -3,13 +3,14 @@ import { BattleshipService } from '../../../../services/battleship.service';
 import {
   Board,
   Cell,
+  CellCoordinates,
   CellType,
   GameData,
+  MoveDirection,
   Ship,
   ShipType,
 } from '../../../../shared/models';
-import { tap } from 'rxjs';
-import {GameDataObserver} from "../../../../observer/GameDataObserver";
+import { GameDataObserver } from '../../../../observer/GameDataObserver';
 
 @Component({
   selector: 'app-board',
@@ -21,14 +22,15 @@ export class BoardComponent implements OnInit {
   @Input() isMyBoard?: boolean = false;
   placingShips = true;
   currentlyPlacingShipType?: ShipType;
-  ShipType = ShipType;
+  currentlyMovingDirection?: MoveDirection = undefined;
 
-  gameDataObserver: GameDataObserver = new GameDataObserver(
-    (gameData) =>{
-      (this.gameData = gameData);
-      this.placingShips = !gameData.playerOne.areAllShipsPlaced;
-    }
-  );
+  ShipType = ShipType;
+  MoveDirection = MoveDirection;
+
+  gameDataObserver: GameDataObserver = new GameDataObserver((gameData) => {
+    this.gameData = gameData;
+    this.placingShips = !gameData.playerOne.areAllShipsPlaced;
+  });
 
   shipTypes = [
     ShipType.Carrier, // 5 tiles
@@ -36,6 +38,13 @@ export class BoardComponent implements OnInit {
     ShipType.Cruiser, // 3 tiles
     ShipType.Submarine, // 3 tiles
     ShipType.Destroyer, // 2 tiles
+  ];
+
+  moveDirections = [
+    MoveDirection.Down,
+    MoveDirection.Left,
+    MoveDirection.Up,
+    MoveDirection.Right,
   ];
 
   constructor(private readonly battleshipService: BattleshipService) {}
@@ -56,7 +65,14 @@ export class BoardComponent implements OnInit {
         if (rightClick) {
           this.cancelShip(cell);
         } else {
-          this.rotateShip(cell);
+          if (this.currentlyMovingDirection) {
+            this.moveShip(this.currentlyMovingDirection, {
+              X: cell.x,
+              Y: cell.y,
+            } as CellCoordinates);
+          } else {
+            this.rotateShip(cell);
+          }
         }
       } else {
         this.placeShip(cell);
@@ -123,5 +139,31 @@ export class BoardComponent implements OnInit {
       (ship) => ship.type === shipType
     );
     return !!item;
+  }
+
+  currentlyMoving(direction: MoveDirection | undefined) {
+    this.currentlyMovingDirection = direction;
+  }
+
+  private moveShip(
+    direction:
+       MoveDirection,
+    coordinates: CellCoordinates
+  ) {
+    switch (direction) {
+      case MoveDirection.Up:
+        this.battleshipService.moveRight(coordinates);
+        break;
+      case MoveDirection.Right:
+        this.battleshipService.moveRight(coordinates);
+        break;
+      case MoveDirection.Down:
+        this.battleshipService.moveRight(coordinates);
+        break;
+      case MoveDirection.Left:
+        this.battleshipService.moveLeft(coordinates);
+        break;
+    }
+
   }
 }

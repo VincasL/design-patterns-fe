@@ -4,13 +4,14 @@ import { MockBoardService } from '../components/game/components/board/mock-board
 import {
   CellType,
   GameData,
-  Move,
+  CellCoordinates,
   Player,
   Ship,
   ShipType,
 } from '../shared/models';
 import { SignalrService } from './signalr.service';
-import {GameDataSubject} from "../observer/GameDataSubject";
+import { GameDataSubject } from '../observer/GameDataSubject';
+import { PlaceShipDto } from '../shared/DTO';
 
 @Injectable({
   providedIn: 'root',
@@ -24,7 +25,7 @@ export class BattleshipService {
     private readonly boardService: MockBoardService
   ) {
     this.registerStartGameHandler();
-    this.registerGameDataHandler();
+    this.addGameDataEventListener();
   }
 
   startGame$ = this.startGameSubject.asObservable();
@@ -47,18 +48,22 @@ export class BattleshipService {
   }
 
   placeShip(ship: Ship) {
-    this.signalRService.send('placeShip', ship);
+    this.signalRService.send(
+      'placeShip',
+      { X: ship.cell.x, Y: ship.cell.y },
+      ship.type
+    );
   }
 
-  undoShip(move: Move) {
-    this.signalRService.send('undoPlaceShip', move)
+  undoShip(move: CellCoordinates) {
+    this.signalRService.send('undoPlaceShip', move);
   }
 
-  rotateShip(move: Move) {
-    this.signalRService.send('rotateShip', move)
+  rotateShip(move: CellCoordinates) {
+    this.signalRService.send('rotateShip', move);
   }
 
-  makeMove(move: Move) {
+  makeMove(move: CellCoordinates) {
     this.signalRService.send('makeMove', move);
   }
 
@@ -73,9 +78,8 @@ export class BattleshipService {
     });
   }
 
-  private registerGameDataHandler() {
+  private addGameDataEventListener() {
     this.signalRService.addEventListener('gameData', (gameData) => {
-      console.log(gameData);
       this.gameDataSubject.receiveGameData(gameData);
     });
   }
@@ -116,12 +120,12 @@ export class BattleshipService {
       playerOne: {
         name: 'Marinis',
         board: this.boardService.createBoard(10, CellType.NotShot),
-        placedShips: [] as Ship[]
+        placedShips: [] as Ship[],
       } as Player,
       playerTwo: {
         name: 'Stepas',
         board: this.boardService.createBoard(10, CellType.NotShot),
-        placedShips: [] as Ship[]
+        placedShips: [] as Ship[],
       } as Player,
       allPlayersPlacedShips: true,
     } as GameData;
@@ -146,7 +150,6 @@ export class BattleshipService {
     data.playerTwo.board.cells[2][2].type = CellType.DestroyedShip;
     data.playerTwo.board.cells[2][2].type = CellType.Empty;
 
-
     this.gameDataSubject.receiveGameData(data);
   }
 
@@ -155,7 +158,7 @@ export class BattleshipService {
       return new Promise((resolve) => setTimeout(resolve, time));
     };
 
-    const moves: Move[] = [];
+    const moves: CellCoordinates[] = [];
 
     moves.push({ X: 0, Y: 0 });
     moves.push({ X: 0, Y: 1 });
@@ -183,5 +186,13 @@ export class BattleshipService {
 
   assignNewConnectionId(connectionId: string) {
     this.signalRService.send('assignNewConnectionId', connectionId);
+  }
+
+  moveRight(coordinates: CellCoordinates) {
+    this.signalRService.send('moveShipToTheRight', coordinates )
+  }
+
+  moveLeft(coordinates: CellCoordinates) {
+    this.signalRService.send('moveShipToTheLeft', coordinates )
   }
 }
