@@ -195,4 +195,12 @@ export class BattleshipService {
   moveLeft(coordinates: CellCoordinates) {
     this.signalRService.send('moveShipToTheLeft', coordinates )
   }
+
+  moveUp(coordinates: CellCoordinates) {
+    this.signalRService.send('moveShipUp', coordinates )
+  }
+
+  moveDown(coordinates: CellCoordinates) {
+    this.signalRService.send('moveShipDown', coordinates )
+  }
 }

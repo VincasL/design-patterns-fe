@@ -65,7 +65,7 @@ export class BoardComponent implements OnInit {
         if (rightClick) {
           this.cancelShip(cell);
         } else {
-          if (this.currentlyMovingDirection) {
+          if (this.currentlyMovingDirection !== undefined) {
             this.moveShip(this.currentlyMovingDirection, {
               X: cell.x,
               Y: cell.y,
@@ -152,13 +152,13 @@ export class BoardComponent implements OnInit {
   ) {
     switch (direction) {
       case MoveDirection.Up:
-        this.battleshipService.moveRight(coordinates);
+        this.battleshipService.moveUp(coordinates);
         break;
       case MoveDirection.Right:
         this.battleshipService.moveRight(coordinates);
         break;
       case MoveDirection.Down:
-        this.battleshipService.moveRight(coordinates);
+        this.battleshipService.moveDown(coordinates);
         break;
       case MoveDirection.Left:
         this.battleshipService.moveLeft(coordinates);
