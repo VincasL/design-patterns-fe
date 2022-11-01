@@ -7,11 +7,10 @@ import {
   CellCoordinates,
   Player,
   Ship,
-  ShipType,
+  ShipType, Cell, Mine,
 } from '../shared/models';
 import { SignalrService } from './signalr.service';
 import { GameDataSubject } from '../observer/GameDataSubject';
-import { PlaceShipDto } from '../shared/DTO';
 
 @Injectable({
   providedIn: 'root',
@@ -52,6 +51,14 @@ export class BattleshipService {
       'placeShip',
       { X: ship.cell.x, Y: ship.cell.y },
       ship.type
+    );
+  }
+
+  placeMine(mine: Mine) {
+    this.signalRService.send(
+      'placeMine',
+      { X: mine.cell.x, Y: mine.cell.y },
+      mine.type
     );
   }
 
@@ -204,4 +211,6 @@ export class BattleshipService {
   moveDown(coordinates: CellCoordinates) {
     this.signalRService.send('moveShipDown', coordinates )
   }
+
+
 }

@@ -1,16 +1,18 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { BattleshipService } from '../../../../services/battleship.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {BattleshipService} from '../../../../services/battleship.service';
 import {
   Board,
   Cell,
   CellCoordinates,
   CellType,
   GameData,
+  Mine,
+  MineType,
   MoveDirection,
   Ship,
   ShipType,
 } from '../../../../shared/models';
-import { GameDataObserver } from '../../../../observer/GameDataObserver';
+import {GameDataObserver} from '../../../../observer/GameDataObserver';
 
 @Component({
   selector: 'app-board',
@@ -21,10 +23,14 @@ export class BoardComponent implements OnInit {
   private gameData?: GameData;
   @Input() isMyBoard?: boolean = false;
   placingShips = true;
+
   currentlyPlacingShipType?: ShipType;
+  currentlyPlacingMineType?: MineType;
+
   currentlyMovingDirection?: MoveDirection = undefined;
 
   ShipType = ShipType;
+  MineType = MineType;
   MoveDirection = MoveDirection;
 
   gameDataObserver: GameDataObserver = new GameDataObserver((gameData) => {
@@ -38,6 +44,12 @@ export class BoardComponent implements OnInit {
     ShipType.Cruiser, // 3 tiles
     ShipType.Submarine, // 3 tiles
     ShipType.Destroyer, // 2 tiles
+  ];
+
+  mineTypes: MineType[] = [
+    MineType.Small,
+    MineType.Huge,
+    MineType.RemoteControlled
   ];
 
   moveDirections = [
@@ -77,25 +89,19 @@ export class BoardComponent implements OnInit {
       } else {
         this.placeShip(cell);
       }
-    } else if (!this.isMyBoard && this.gameData?.isYourMove) {
-      this.battleshipService.makeMove({ X: cell.x, Y: cell.y });
+    } else if (!this.isMyBoard) {
+      if(this.gameData?.isYourMove && this.gameData?.allPlayersPlacedShips)
+      {
+        this.battleshipService.makeMove({ X: cell.x, Y: cell.y });
+      }
+      else if(this.placingShips)
+      {
+        this.placeMine(cell);
+      }
     }
 
     // prevent default click behaviour
     return false;
-  }
-
-  private placeShip(cell: Cell) {
-    console.log(cell);
-    if (this.currentlyPlacingShipType !== undefined) {
-      const ship: Ship = {
-        cell,
-        type: this.currentlyPlacingShipType,
-        isHorizontal: true,
-      };
-      this.battleshipService.placeShip(ship);
-      this.currentlyPlacingShipType = undefined;
-    }
   }
 
   private cancelShip(cell: Cell) {
@@ -131,12 +137,21 @@ export class BoardComponent implements OnInit {
         return 'notshot';
       case CellType.Ship:
         return 'ship';
+      case CellType.Mine:
+        return 'mine';
     }
   }
 
   shipIsPlaced(shipType: ShipType): boolean {
     const item = this.gameData?.playerOne.placedShips.find(
       (ship) => ship.type === shipType
+    );
+    return !!item;
+  }
+
+  mineIsPlaced(mineType: MineType): boolean {
+    const item = this.gameData?.playerOne.placedMines.find(
+      (mine) => mine.type === mineType
     );
     return !!item;
   }
@@ -164,6 +179,31 @@ export class BoardComponent implements OnInit {
         this.battleshipService.moveLeft(coordinates);
         break;
     }
-
   }
+
+  private placeShip(cell: Cell) {
+    console.log(cell);
+    if (this.currentlyPlacingShipType !== undefined) {
+      const ship: Ship = {
+        cell,
+        type: this.currentlyPlacingShipType,
+        isHorizontal: true,
+      };
+      this.battleshipService.placeShip(ship);
+      this.currentlyPlacingShipType = undefined;
+    }
+  }
+
+  private placeMine(cell: Cell) {
+    console.log(cell);
+    if (this.currentlyPlacingMineType !== undefined) {
+      const mine: Mine = {
+        cell,
+        type: this.currentlyPlacingMineType
+      };
+      this.battleshipService.placeMine(mine);
+      this.currentlyPlacingMineType = undefined;
+    }
+  }
+
 }

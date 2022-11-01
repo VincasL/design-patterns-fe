@@ -2,7 +2,8 @@ export interface Player {
   name: string;
   connectionId: string;
   board: Board;
-  placedShips: Ship[]
+  placedShips: Ship[];
+  placedMines: Mine[];
   areAllShipsPlaced: boolean,
 }
 
@@ -29,6 +30,13 @@ export enum ShipType {
   Destroyer, // 2 tiles
 }
 
+export enum MineType {
+  Small,
+  Huge,
+  RemoteControlled
+}
+
+
 export enum MoveDirection{
   Up,
   Right,
@@ -40,6 +48,11 @@ export interface Ship {
   type: ShipType;
   cell: Cell;
   isHorizontal: boolean;
+}
+
+export interface Mine {
+  type: MineType;
+  cell: Cell;
 }
 
 export interface Board {
@@ -54,6 +67,7 @@ export enum CellType {
   DamagedShip,
   DestroyedShip,
   EmptyShot,
+  Mine
 }
 
 export interface CellCoordinates {

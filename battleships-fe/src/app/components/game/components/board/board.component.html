@@ -1,30 +1,49 @@
+<!--ship placing area-->
+<div
+  *ngIf="isMyBoard && placingShips"
+  class="d-flex justify-content-around py-2"
+  id="ships"
 
-
-<!--ship placing area -->
-<div *ngIf="isMyBoard && placingShips" class="d-flex justify-content-around py-2">
+>
   <button
     [disabled]="shipIsPlaced(shipType)"
     *ngFor="let shipType of shipTypes"
     (click)="currentlyPlacingShipType = shipType"
+    [id]="shipType"
   >
     {{ ShipType[shipType] }}
   </button>
 </div>
 
-<!-- ship moving area -->
-<div *ngIf="isMyBoard && placingShips" class="d-flex justify-content-around py-2">
+<!--mine placing area -->
+<div
+  *ngIf="!isMyBoard && placingShips"
+  class="d-flex justify-content-around py-2"
+  id="mines"
+>
+  <button
+    [disabled]="mineIsPlaced(mineType)"
+    *ngFor="let mineType of mineTypes"
+    (click)="currentlyPlacingMineType = mineType"
+    [id]="mineType"
+  >
+    {{ MineType[mineType] }}
+  </button>
+</div>
+
+<!-- moving area -->
+<div
+  *ngIf="isMyBoard && placingShips"
+  class="d-flex justify-content-around py-2"
+>
   <button
     *ngFor="let moveDirection of moveDirections"
     (click)="currentlyMovingDirection = moveDirection"
   >
     {{ MoveDirection[moveDirection] }}
   </button>
-  <button (click)="currentlyMoving(undefined)"> done </button>
+  <button (click)="currentlyMoving(undefined)">done</button>
 </div>
-
-
-
-
 
 <div class="board">
   <div *ngFor="let row of board?.cells" class="board-row">
