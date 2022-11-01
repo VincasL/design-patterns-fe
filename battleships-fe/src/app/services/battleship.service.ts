@@ -81,6 +81,7 @@ export class BattleshipService {
   private addGameDataEventListener() {
     this.signalRService.addEventListener('gameData', (gameData) => {
       this.gameDataSubject.receiveGameData(gameData);
+      console.log(gameData);
     });
   }
 

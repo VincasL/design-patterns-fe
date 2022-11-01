@@ -1,8 +1,8 @@
-import {GameData} from "../shared/models";
-import {Subject} from "./Subject";
-import {GameDataObserver} from "./GameDataObserver";
+import { GameData } from '../shared/models';
+import { Subject } from './Subject';
+import { GameDataObserver } from './GameDataObserver';
 
-export class GameDataSubject extends Subject{
+export class GameDataSubject extends Subject {
   override observers = [];
   override _data: GameData = {} as GameData;
 

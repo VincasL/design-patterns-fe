@@ -1,22 +1,22 @@
-import {Observer} from "./Observer";
+import { Observer } from './Observer';
 
 export abstract class Subject {
-  observers: Observer[] = []
-  _data: unknown
+  observers: Observer[] = [];
+  _data: unknown;
 
-  send(){
+  send() {
     this.observers.forEach((observer) => {
       observer.update(this._data);
-    })
+    });
   }
-  receiveGameData(data: unknown){
+  receiveGameData(data: unknown) {
     this._data = data;
     this.send();
   }
-  subscribe(observer: Observer ){
-    this.observers.push(observer)
+  subscribe(observer: Observer) {
+    this.observers.push(observer);
   }
-  unsubscribe(observer: Observer){
-
+  unsubscribe(observer: Observer) {
+    this.observers.filter((x) => x != observer);
   }
 }
