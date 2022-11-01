@@ -14,12 +14,10 @@ export class GameComponent implements OnInit {
 
   gameData?: GameData;
 
-  gameDataObserver: GameDataObserver = new GameDataObserver(
-    (gameData) =>{
-      (this.gameData = gameData);
-      sessionStorage.setItem('connectionId', gameData.playerOne.connectionId);
-    }
-  );
+  gameDataObserver: GameDataObserver = new GameDataObserver((gameData) => {
+    this.gameData = gameData;
+    sessionStorage.setItem('connectionId', gameData.playerOne.connectionId);
+  });
 
   ngOnInit(): void {
     this.assignNewConnectionIdToPlayerAfterRefresh();
@@ -54,6 +52,6 @@ export class GameComponent implements OnInit {
   }
 
   moveRight() {
-    this.battleshipService.moveRight({X: 1, Y:1});
+    this.battleshipService.moveRight({ X: 1, Y: 1 });
   }
 }
