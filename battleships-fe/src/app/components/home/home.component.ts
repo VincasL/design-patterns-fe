@@ -9,7 +9,7 @@ import { BattleshipService } from '../../services/battleship.service';
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit {
-  form = new FormGroup({ name: new FormControl(null, Validators.required) });
+  form = new FormGroup({ name: new FormControl(null, Validators.required),nation:new FormControl("", Validators.required) });
   isWaitingForOpponent = false;
 
   constructor(
@@ -24,6 +24,9 @@ export class HomeComponent implements OnInit {
   get name() {
     return this.form.get('name');
   }
+  get nation() {
+    return this.form.get('name');
+  }
 
   submit() {
     this.form.markAllAsTouched();
@@ -36,8 +39,19 @@ export class HomeComponent implements OnInit {
 
   onStartPlaying(formValue: any) {
     const name = formValue.name;
+    const nation = formValue.nation;
     this.battleshipService
-      .startGame(name)
+      .startGame(name,nation)
       .subscribe(() => this.router.navigate(['/game']));
+  }
+  
+  setRussian() {
+    this.form.controls['nation'].setValue("Russian");
+  }
+  setAmerican() {
+    this.form.controls['nation'].setValue("American");
+  }
+  setGerman() {
+    this.form.controls['nation'].setValue("German");
   }
 }

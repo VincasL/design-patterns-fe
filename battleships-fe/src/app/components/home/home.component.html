@@ -3,11 +3,18 @@
   <h2>Enter your name and click play to start</h2>
   <form [formGroup]="form" (submit)="submit()">
     <input id="name" type="text" formControlName="name" />
+    <h2>Select your nation</h2>
+    <div>
+      <button (click)="setRussian()">Russian</button>
+      <button (click)="setAmerican()">American</button>
+      <button (click)="setGerman()">German</button>
+    </div>
     <div
       *ngIf="name?.invalid && (name?.dirty || name?.touched)"
       class="text-danger"
     >
-      <div *ngIf="name?.errors?.['required']">Name is required.</div>
+   
+      <div *ngIf="name?.errors?.['required']">Name and nation is required.</div> 
     </div>
 
     <input type="submit" value="Play" />

@@ -33,14 +33,14 @@ export class BattleshipService {
 
   ships: Ship[] = [];
 
-  startGame(name: string): Observable<void> {
-    this.joinQueue(name);
+  startGame(name: string,nation: string): Observable<void> {
+    this.joinQueue(name,nation);
     return this.startGame$;
   }
 
   // Sending events
-  joinQueue(name: string) {
-    this.signalRService.send('joinQueue', name);
+  joinQueue(name: string,nation: string) {
+    this.signalRService.send('joinQueue', name,nation);
   }
 
   saveShips() {
