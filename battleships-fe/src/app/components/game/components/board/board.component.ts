@@ -1,9 +1,8 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, HostListener, Input, OnInit} from '@angular/core';
 import {BattleshipService} from '../../../../services/battleship.service';
 import {
   Board,
   Cell,
-  CellCoordinates,
   CellType,
   GameData,
   Mine,
@@ -13,6 +12,7 @@ import {
   ShipType,
 } from '../../../../shared/models';
 import {GameDataObserver} from '../../../../observer/GameDataObserver';
+import {GameComponentService, LastClickedCellData,} from '../../game.component.service';
 
 @Component({
   selector: 'app-board',
@@ -23,11 +23,9 @@ export class BoardComponent implements OnInit {
   private gameData?: GameData;
   @Input() isMyBoard?: boolean = false;
   placingShips = true;
-
+  lastClickedCell?: LastClickedCellData;
   currentlyPlacingShipType?: ShipType;
   currentlyPlacingMineType?: MineType;
-
-  currentlyMovingDirection?: MoveDirection = undefined;
 
   ShipType = ShipType;
   MineType = MineType;
@@ -49,7 +47,7 @@ export class BoardComponent implements OnInit {
   mineTypes: MineType[] = [
     MineType.Small,
     MineType.Huge,
-    MineType.RemoteControlled
+    MineType.RemoteControlled,
   ];
 
   moveDirections = [
@@ -59,10 +57,16 @@ export class BoardComponent implements OnInit {
     MoveDirection.Right,
   ];
 
-  constructor(private readonly battleshipService: BattleshipService) {}
+  constructor(
+    private readonly battleshipService: BattleshipService,
+    private readonly gameComponentService: GameComponentService
+  ) {}
 
   ngOnInit(): void {
     this.battleshipService.gameData$.subscribe(this.gameDataObserver);
+    this.gameComponentService.lastClickedCell$.subscribe(
+      (data) => (this.lastClickedCell = data)
+    );
   }
 
   get board(): Board | undefined {
@@ -72,30 +76,23 @@ export class BoardComponent implements OnInit {
   }
 
   onCellClick(cell: Cell, rightClick = false) {
+    this.gameComponentService.setLastClickedCell({
+      coordinates: { X: cell.x, Y: cell.y },
+      myBoard: this.isMyBoard ?? true,
+    });
+
     if (this.isMyBoard && this.placingShips) {
       if (cell.type === CellType.Ship) {
         if (rightClick) {
-          this.cancelShip(cell);
         } else {
-          if (this.currentlyMovingDirection !== undefined) {
-            this.moveShip(this.currentlyMovingDirection, {
-              X: cell.x,
-              Y: cell.y,
-            } as CellCoordinates);
-          } else {
-            this.rotateShip(cell);
-          }
         }
       } else {
         this.placeShip(cell);
       }
     } else if (!this.isMyBoard) {
-      if(this.gameData?.isYourMove && this.gameData?.allPlayersPlacedShips)
-      {
+      if (this.gameData?.isYourMove && this.gameData?.allPlayersPlacedShips) {
         this.battleshipService.makeMove({ X: cell.x, Y: cell.y });
-      }
-      else if(this.placingShips)
-      {
+      } else if (this.placingShips) {
         this.placeMine(cell);
       }
     }
@@ -156,31 +153,6 @@ export class BoardComponent implements OnInit {
     return !!item;
   }
 
-  currentlyMoving(direction: MoveDirection | undefined) {
-    this.currentlyMovingDirection = direction;
-  }
-
-  private moveShip(
-    direction:
-       MoveDirection,
-    coordinates: CellCoordinates
-  ) {
-    switch (direction) {
-      case MoveDirection.Up:
-        this.battleshipService.moveUp(coordinates);
-        break;
-      case MoveDirection.Right:
-        this.battleshipService.moveRight(coordinates);
-        break;
-      case MoveDirection.Down:
-        this.battleshipService.moveDown(coordinates);
-        break;
-      case MoveDirection.Left:
-        this.battleshipService.moveLeft(coordinates);
-        break;
-    }
-  }
-
   private placeShip(cell: Cell) {
     console.log(cell);
     if (this.currentlyPlacingShipType !== undefined) {
@@ -199,11 +171,72 @@ export class BoardComponent implements OnInit {
     if (this.currentlyPlacingMineType !== undefined) {
       const mine: Mine = {
         cell,
-        type: this.currentlyPlacingMineType
+        type: this.currentlyPlacingMineType,
       };
       this.battleshipService.placeMine(mine);
       this.currentlyPlacingMineType = undefined;
     }
   }
 
+  @HostListener('window:keyup', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    event.stopImmediatePropagation();
+
+    const isEnemyBoard = !this.lastClickedCell?.myBoard;
+
+    if (!this.lastClickedCell || !this.placingShips) return;
+
+    switch (event.code) {
+      case KEY_CODE.DOWN_ARROW:
+        this.battleshipService.move(this.lastClickedCell.coordinates, MoveDirection.Down, isEnemyBoard);
+
+        if (this.lastClickedCell.coordinates.Y + 1 < 10) {
+          this.lastClickedCell.coordinates.Y++;
+        }
+
+        break;
+      case KEY_CODE.UP_ARROW:
+        this.battleshipService.move(this.lastClickedCell.coordinates, MoveDirection.Up, isEnemyBoard);
+
+        if (this.lastClickedCell.coordinates.Y > 0) {
+          this.lastClickedCell.coordinates.Y--;
+        }
+        break;
+      case KEY_CODE.LEFT_ARROW:
+        this.battleshipService.move(this.lastClickedCell.coordinates, MoveDirection.Left, isEnemyBoard);
+
+        if (this.lastClickedCell.coordinates.X > 0) {
+          this.lastClickedCell.coordinates.X--;
+        }
+        break;
+      case KEY_CODE.RIGHT_ARROW:
+        this.battleshipService.move(this.lastClickedCell.coordinates, MoveDirection.Right, isEnemyBoard);
+
+        if (this.lastClickedCell.coordinates.X + 1 < 10) {
+          this.lastClickedCell.coordinates.X += 1;
+        }
+        break;
+      case KEY_CODE.DELETE:
+        this.battleshipService.undoShip(this.lastClickedCell.coordinates);
+        break;
+      case KEY_CODE.SPACE:
+        this.battleshipService.rotateShip(this.lastClickedCell.coordinates);
+        break;
+      default:
+        break;
+    }
+
+    if(event.code != KEY_CODE.DELETE)
+    {
+    }
+  }
+}
+
+export enum KEY_CODE {
+  UP_ARROW = 'ArrowUp',
+  DOWN_ARROW = 'ArrowDown',
+  RIGHT_ARROW = 'ArrowRight',
+  LEFT_ARROW = 'ArrowLeft',
+  DELETE = 'Delete',
+  SPACE = 'Space'
 }

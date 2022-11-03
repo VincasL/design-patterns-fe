@@ -1,16 +1,19 @@
-import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { MockBoardService } from '../components/game/components/board/mock-board.service';
+import {Injectable} from '@angular/core';
+import {Observable, Subject} from 'rxjs';
+import {MockBoardService} from '../components/game/components/board/mock-board.service';
 import {
+  CellCoordinates,
   CellType,
   GameData,
-  CellCoordinates,
+  Mine,
+  MineType,
+  MoveDirection,
   Player,
   Ship,
-  ShipType, Cell, Mine,
+  ShipType,
 } from '../shared/models';
-import { SignalrService } from './signalr.service';
-import { GameDataSubject } from '../observer/GameDataSubject';
+import {SignalrService} from './signalr.service';
+import {GameDataSubject} from '../observer/GameDataSubject';
 
 @Injectable({
   providedIn: 'root',
@@ -31,6 +34,10 @@ export class BattleshipService {
   gameData$ = this.gameDataSubject;
 
   ships: Ship[] = [];
+
+  delay = (time: number) => {
+    return new Promise((resolve) => setTimeout(resolve, time));
+  };
 
   startGame(name: string,nation: string): Observable<void> {
     this.joinQueue(name,nation);
@@ -93,7 +100,7 @@ export class BattleshipService {
   }
 
   sendMockShipData() {
-    const data = [
+    const shipData = [
       {
         type: ShipType.Battleship,
         cell: { x: 0, y: 0 },
@@ -120,7 +127,25 @@ export class BattleshipService {
         isHorizontal: true,
       },
     ] as Ship[];
-    data.forEach((item: Ship) => this.placeShip(item));
+
+    const mineData = [
+      {
+        type: MineType.RemoteControlled,
+        cell: { x: 8, y: 8 },
+      } as Mine,
+      {
+        type: MineType.Small,
+        cell: { x: 1, y: 1 }
+
+      },
+      {
+        type: MineType.Huge,
+        cell: { x: 3, y: 3 }
+      },
+    ] as Mine[];
+
+    shipData.forEach((item: Ship) => this.placeShip(item));
+    mineData.forEach((item: Mine) => this.placeMine(item));
   }
 
   setMockGameSessionData() {
@@ -161,34 +186,10 @@ export class BattleshipService {
     this.gameDataSubject.receiveGameData(data);
   }
 
-  async destroyAllShipsAndWinGame() {
-    const delay = (time: number) => {
-      return new Promise((resolve) => setTimeout(resolve, time));
-    };
-
-    const moves: CellCoordinates[] = [];
-
-    moves.push({ X: 0, Y: 0 });
-    moves.push({ X: 0, Y: 1 });
-    moves.push({ X: 0, Y: 2 });
-    moves.push({ X: 0, Y: 3 });
-    moves.push({ X: 1, Y: 1 });
-    moves.push({ X: 1, Y: 2 });
-    moves.push({ X: 1, Y: 3 });
-    moves.push({ X: 1, Y: 4 });
-    moves.push({ X: 1, Y: 5 });
-    moves.push({ X: 2, Y: 2 });
-    moves.push({ X: 2, Y: 3 });
-    moves.push({ X: 2, Y: 4 });
-    moves.push({ X: 3, Y: 3 });
-    moves.push({ X: 3, Y: 4 });
-    moves.push({ X: 4, Y: 4 });
-    moves.push({ X: 4, Y: 5 });
-    moves.push({ X: 4, Y: 6 });
-
-    for (const move of moves) {
-      await delay(1000);
-      this.makeMove(move);
+  async makeRandomMoves() {
+    for (let i = 0; i < 500; i++) {
+      await this.delay(10);
+      this.makeMove({X: this.getRndInteger(0, 10), Y: this.getRndInteger(0, 10)});
     }
   }
 
@@ -196,20 +197,14 @@ export class BattleshipService {
     this.signalRService.send('assignNewConnectionId', connectionId);
   }
 
-  moveRight(coordinates: CellCoordinates) {
-    this.signalRService.send('moveShipToTheRight', coordinates )
+  move(coordinates: CellCoordinates, direction: MoveDirection, isEnemyBoard: boolean = false)
+  {
+    this.signalRService.send('moveUnit', coordinates, direction, isEnemyBoard);
   }
 
-  moveLeft(coordinates: CellCoordinates) {
-    this.signalRService.send('moveShipToTheLeft', coordinates )
-  }
 
-  moveUp(coordinates: CellCoordinates) {
-    this.signalRService.send('moveShipUp', coordinates )
-  }
-
-  moveDown(coordinates: CellCoordinates) {
-    this.signalRService.send('moveShipDown', coordinates )
+  getRndInteger(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min) ) + min;
   }
 
 

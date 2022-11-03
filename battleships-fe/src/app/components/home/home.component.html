@@ -4,7 +4,7 @@
   <form [formGroup]="form" (submit)="submit()">
     <input id="name" type="text" formControlName="name" />
     <h2>Select your nation</h2>
-    <div>
+    <div class="flex mx-auto justify-content-around w-25">
       <button (click)="setRussian()">Russian</button>
       <button (click)="setAmerican()">American</button>
       <button (click)="setGerman()">German</button>
@@ -13,8 +13,7 @@
       *ngIf="name?.invalid && (name?.dirty || name?.touched)"
       class="text-danger"
     >
-   
-      <div *ngIf="name?.errors?.['required']">Name and nation is required.</div> 
+      <div *ngIf="name?.errors?.['required']">Name and nation is required.</div>
     </div>
 
     <input type="submit" value="Play" />

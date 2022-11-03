@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { filter, Observable, tap } from 'rxjs';
-import { GameData, Ship } from '../../shared/models';
+import { GameData } from '../../shared/models';
 import { BattleshipService } from '../../services/battleship.service';
 import { GameDataObserver } from '../../observer/GameDataObserver';
+import { GameComponentService } from './game.component.service';
 
 @Component({
   selector: 'app-game',
@@ -10,12 +10,17 @@ import { GameDataObserver } from '../../observer/GameDataObserver';
   styleUrls: ['./game.component.css'],
 })
 export class GameComponent implements OnInit {
-  constructor(private readonly battleshipService: BattleshipService) {}
+  constructor(
+    private readonly battleshipService: BattleshipService,
+    private readonly gameComponentService: GameComponentService
+  ) {}
 
   gameData?: GameData;
+  placingShips = true;
 
   gameDataObserver: GameDataObserver = new GameDataObserver((gameData) => {
     this.gameData = gameData;
+    this.placingShips = !gameData.playerOne.areAllShipsPlaced;
     sessionStorage.setItem('connectionId', gameData.playerOne.connectionId);
   });
 
@@ -32,12 +37,8 @@ export class GameComponent implements OnInit {
     this.battleshipService.sendMockShipData();
   }
 
-  setMockSessionData() {
-    this.battleshipService.setMockGameSessionData();
-  }
-
-  destroyEverything() {
-    this.battleshipService.destroyAllShipsAndWinGame();
+  sendRandomMoveData() {
+    this.battleshipService.makeRandomMoves();
   }
 
   private assignNewConnectionIdToPlayerAfterRefresh() {
@@ -51,7 +52,5 @@ export class GameComponent implements OnInit {
     }
   }
 
-  moveRight() {
-    this.battleshipService.moveRight({ X: 1, Y: 1 });
-  }
+
 }

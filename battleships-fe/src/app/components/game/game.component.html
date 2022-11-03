@@ -1,31 +1,30 @@
 <div class="flex flex-col min-h-screen space-y-2">
   <div class="header">
     <div class="flex space-x-2 justify-center">
-      <button (click)="sendMockShipData()">Place mock ships</button>
-      <button (click)="setMockSessionData()">Set mock session data</button>
-      <button (click)="destroyEverything()">Destroy</button>
-      <button (click)="sendShipData()">place ships</button>
+      <button *ngIf="placingShips"(click)="sendMockShipData()">Place mock ships</button>
+      <button *ngIf="gameData?.allPlayersPlacedShips" (click)="sendRandomMoveData()">Send 500 random moves</button>
+      <button *ngIf="placingShips" (click)="sendShipData()">Save ships</button>
 
     </div>
   </div>
 
-  <h1 *ngIf="gameData?.isGameOver">
-    {{ gameData?.winner ? "Winner" : "Loser" }}
+  <h1 class="text-2xl text-center" *ngIf="gameData?.isGameOver">
+    {{ gameData?.winner ? "Winner!!!!" : "Loser!!!!" }}
   </h1>
 
-  <h2 *ngIf="gameData && gameData.allPlayersPlacedShips">
+  <h2 class="text-2xl text-center" *ngIf="gameData && gameData.allPlayersPlacedShips && gameData?.winner === null">
     {{gameData.isYourMove ? "Your move" : "Enemy move"}}
   </h2>
 
   <div class="game">
     <div class="flex flex-col">
-      <h1 class="text-center">{{ gameData?.playerOne?.name }}</h1>
+      <h1 class="text-center text-2xl pb-3">{{ gameData?.playerOne?.name  }} (you)</h1>
       <app-board
         [isMyBoard]="true"
       ></app-board>
     </div>
     <div class="flex flex-col">
-      <h1 class="text-center">{{ gameData?.playerTwo?.name }}</h1>
+      <h1 class="text-center text-2xl pb-3">{{ gameData?.playerTwo?.name }}</h1>
       <app-board
         [isMyBoard]="false"
       ></app-board>
