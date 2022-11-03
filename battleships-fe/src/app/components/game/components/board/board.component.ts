@@ -150,7 +150,7 @@ export class BoardComponent implements OnInit {
   }
 
   mineIsPlaced(mineType: MineType): boolean {
-    const item = this.gameData?.playerTwo.placedMines.find(
+    const item = this.gameData?.playerOne.placedMines.find(
       (mine) => mine.type === mineType
     );
     return !!item;
