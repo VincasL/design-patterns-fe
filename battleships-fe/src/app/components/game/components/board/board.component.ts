@@ -184,7 +184,7 @@ export class BoardComponent implements OnInit {
 
     const isEnemyBoard = !this.lastClickedCell?.myBoard;
 
-    if (!this.lastClickedCell || !this.placingShips) return;
+    if (!this.lastClickedCell || !this.placingShips && !this.isMyBoard) return;
 
     switch (event.code) {
       case KEY_CODE.DOWN_ARROW:
