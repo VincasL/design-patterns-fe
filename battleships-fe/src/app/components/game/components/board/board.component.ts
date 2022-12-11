@@ -1,5 +1,5 @@
-import {Component, HostListener, Input, OnInit} from '@angular/core';
-import {BattleshipService} from '../../../../services/battleship.service';
+import { Component, HostListener, Input, OnInit } from '@angular/core';
+import { BattleshipService } from '../../../../services/battleship.service';
 import {
   Board,
   Cell,
@@ -11,8 +11,11 @@ import {
   Ship,
   ShipType,
 } from '../../../../shared/models';
-import {GameDataObserver} from '../../../../observer/GameDataObserver';
-import {GameComponentService, LastClickedCellData,} from '../../game.component.service';
+import { GameDataObserver } from '../../../../observer/GameDataObserver';
+import {
+  GameComponentService,
+  LastClickedCellData,
+} from '../../game.component.service';
 
 @Component({
   selector: 'app-board',
@@ -114,9 +117,10 @@ export class BoardComponent implements OnInit {
   }
 
   isEditable() {
+    if (this.gameData?.isYourMove) return '';
     if (this.gameData?.isGameOver) return 'not';
     if (this.gameData?.allPlayersPlacedShips && this.isMyBoard) return 'not';
-    if (!this.gameData?.isYourMove && !this.isMyBoard) return 'not';
+    if (!this.gameData?.isYourMove) return 'not';
     return '';
   }
   //
@@ -184,11 +188,16 @@ export class BoardComponent implements OnInit {
 
     const isEnemyBoard = !this.lastClickedCell?.myBoard;
 
-    if (!this.lastClickedCell || !this.placingShips && !this.isMyBoard) return;
+    if (!this.lastClickedCell || (!this.placingShips && !this.isMyBoard))
+      return;
 
     switch (event.code) {
       case KEY_CODE.DOWN_ARROW:
-        this.battleshipService.move(this.lastClickedCell.coordinates, MoveDirection.Down, isEnemyBoard);
+        this.battleshipService.move(
+          this.lastClickedCell.coordinates,
+          MoveDirection.Down,
+          isEnemyBoard
+        );
 
         if (this.lastClickedCell.coordinates.Y + 1 < 10) {
           this.lastClickedCell.coordinates.Y++;
@@ -196,21 +205,33 @@ export class BoardComponent implements OnInit {
 
         break;
       case KEY_CODE.UP_ARROW:
-        this.battleshipService.move(this.lastClickedCell.coordinates, MoveDirection.Up, isEnemyBoard);
+        this.battleshipService.move(
+          this.lastClickedCell.coordinates,
+          MoveDirection.Up,
+          isEnemyBoard
+        );
 
         if (this.lastClickedCell.coordinates.Y > 0) {
           this.lastClickedCell.coordinates.Y--;
         }
         break;
       case KEY_CODE.LEFT_ARROW:
-        this.battleshipService.move(this.lastClickedCell.coordinates, MoveDirection.Left, isEnemyBoard);
+        this.battleshipService.move(
+          this.lastClickedCell.coordinates,
+          MoveDirection.Left,
+          isEnemyBoard
+        );
 
         if (this.lastClickedCell.coordinates.X > 0) {
           this.lastClickedCell.coordinates.X--;
         }
         break;
       case KEY_CODE.RIGHT_ARROW:
-        this.battleshipService.move(this.lastClickedCell.coordinates, MoveDirection.Right, isEnemyBoard);
+        this.battleshipService.move(
+          this.lastClickedCell.coordinates,
+          MoveDirection.Right,
+          isEnemyBoard
+        );
 
         if (this.lastClickedCell.coordinates.X + 1 < 10) {
           this.lastClickedCell.coordinates.X += 1;
@@ -226,8 +247,7 @@ export class BoardComponent implements OnInit {
         break;
     }
 
-    if(event.code != KEY_CODE.DELETE)
-    {
+    if (event.code != KEY_CODE.DELETE) {
     }
   }
 }
@@ -238,5 +258,5 @@ export enum KEY_CODE {
   RIGHT_ARROW = 'ArrowRight',
   LEFT_ARROW = 'ArrowLeft',
   DELETE = 'Delete',
-  SPACE = 'Space'
+  SPACE = 'Space',
 }
